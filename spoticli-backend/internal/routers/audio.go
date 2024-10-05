@@ -12,7 +12,7 @@ func AudioRouter() *mux.Router {
 	get.HandlerFunc(controllers.GetPresignedUrl)
 
 	stream := router.Path("/{presigned-url}").Methods("GET")
-	get.HandlerFunc(controllers.GetAudio)
+	stream.HandlerFunc(controllers.GetAudio)
 
 	// post := router.Methods("POST")
 	// post.HandlerFunc(nil)
