@@ -8,11 +8,15 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/mstttm/spoticli/spoticli-backend/internal/models"
+	"github.com/mstttm/spoticli/spoticli-backend/internal/routers"
 )
 
 func main() {
 	r := mux.NewRouter()
+
 	r.HandleFunc("/", HealthHandler)
+	r.Handle("/audio", routers.AudioRouter())
+
 	http.Handle("/", r)
 	fmt.Println("Listening on locslhost:4200")
 	err := http.ListenAndServe(":4200", r)
