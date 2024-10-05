@@ -5,18 +5,18 @@ import "sync"
 type StorageService struct {
 }
 
-var lock = &sync.Mutex{}
+var storageLock = &sync.Mutex{}
 
-var instance *StorageService
+var storageService *StorageService
 
-func GetInstance() *StorageService {
-	if instance == nil {
-		lock.Lock()
-		defer lock.Unlock()
-		if instance == nil {
-			instance = &StorageService{}
+func GetStorageService() *StorageService {
+	if storageService == nil {
+		storageLock.Lock()
+		defer storageLock.Unlock()
+		if storageService == nil {
+			storageService = &StorageService{}
 		}
 	}
 
-	return instance
+	return storageService
 }
