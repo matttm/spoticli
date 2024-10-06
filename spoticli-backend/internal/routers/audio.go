@@ -5,10 +5,7 @@ import (
 	"github.com/mstttm/spoticli/spoticli-backend/internal/controllers"
 )
 
-func AudioRouter() *mux.Router {
-	router := mux.
-		NewRouter()
-	audio := router.PathPrefix("/audio")
+func AttachAudioRouter(audio *mux.Router) *mux.Router {
 
 	get := audio.Path("/{song-id}").Methods("GET")
 	get.HandlerFunc(controllers.GetPresignedUrl)
@@ -19,5 +16,5 @@ func AudioRouter() *mux.Router {
 	// post := router.Methods("POST")
 	// post.HandlerFunc(nil)
 
-	return router
+	return audio
 }

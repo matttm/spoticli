@@ -15,7 +15,7 @@ func main() {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/", HealthHandler)
-	r.Handle("/audio", routers.AudioRouter())
+	routers.AttachAudioRouter(r.PathPrefix("/audio").Subrouter())
 
 	http.Handle("/", r)
 	fmt.Println("Listening on locslhost:4200")
