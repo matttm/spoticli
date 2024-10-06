@@ -19,6 +19,7 @@ func main() {
 
 	http.Handle("/", r)
 	fmt.Println("Listening on locslhost:4200")
+	printEndpoints(r)
 	err := http.ListenAndServe(":4200", r)
 	if err != nil {
 		panic(err)
@@ -36,4 +37,19 @@ func HealthHandler(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	w.Write(b)
+}
+
+func printEndpoints(r *mux.Router) {
+	r.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
+		path, err := route.GetPathTemplate()
+		if err != nil {
+			return nil
+		}
+		methods, err := route.GetMethods()
+		if err != nil {
+			return nil
+		}
+		fmt.Printf("%v %s\n", methods, path)
+		return nil
+	})
 }

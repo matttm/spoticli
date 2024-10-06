@@ -1,8 +1,11 @@
 package services
 
 import (
+	"context"
 	"sync"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
+	v4 "github.com/aws/aws-sdk-go-v2/aws/signer/v4"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
@@ -30,5 +33,12 @@ func GetStorageService() *StorageService {
 	return storageService
 }
 
-func (s *StorageService) GetPresignedUrl() {
+func (s *StorageService) GetPresignedUrl() (*v4.PresignedHTTPRequest, error) {
+	return s.psClient.PresignGetObject(
+		context.TODO(),
+		&s3.GetObjectInput{
+			Bucket: aws.String("spoticli-tracks"),
+			Key:    aws.String("bat_country.mp3"),
+		},
+	)
 }
