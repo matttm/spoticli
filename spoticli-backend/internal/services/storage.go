@@ -2,6 +2,7 @@ package services
 
 import "sync"
 
+// / TODO: use go:generate to make singleton
 type StorageService struct {
 }
 
