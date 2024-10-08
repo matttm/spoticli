@@ -7,10 +7,10 @@ import (
 
 func AttachAudioRouter(audio *mux.Router) *mux.Router {
 
-	get := audio.Path("/{song-id}").Methods("GET")
+	get := audio.Path("/{id:[0-9]+}").Methods("GET")
 	get.HandlerFunc(controllers.GetPresignedUrl)
 
-	stream := audio.Path("/{presigned-url}").Methods("GET")
+	stream := audio.Path("/{url}").Methods("GET")
 	stream.HandlerFunc(controllers.GetAudio)
 
 	// post := router.Methods("POST")

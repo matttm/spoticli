@@ -29,7 +29,7 @@ func GetStorageService() *StorageService {
 			storageService.psClient = s3.NewPresignClient(storageService.client)
 		}
 	}
-
+	println("StorageService Instantiated")
 	return storageService
 }
 

@@ -8,9 +8,11 @@ import (
 )
 
 func GetPresignedUrl(w http.ResponseWriter, r *http.Request) {
+	println("getting presigned url")
 	svc := services.GetStorageService()
 	req, err := svc.GetPresignedUrl()
 	if err != nil {
+		panic(err)
 	}
 	b, _ := json.Marshal(req)
 	w.Write(b)

@@ -20,24 +20,17 @@ var configService *ConfigService
 
 func GetConfigService() *ConfigService {
 	if configService == nil {
-		storageLock.Lock()
-		defer storageLock.Unlock()
+		configLock.Lock()
+		defer configLock.Unlock()
 		if configService == nil {
 			configService = &ConfigService{}
-			cfg, err := config.LoadDefaultConfig(context.TODO(),
-				config.WithSharedCredentialsFiles(
-					[]string{"test/credentials", "data/credentials"},
-				),
-				config.WithSharedConfigFiles(
-					[]string{"test/config", "data/config"},
-				),
-			)
+			cfg, err := config.LoadDefaultConfig(context.TODO())
 			if err != nil {
 				panic(err)
 			}
 			configService.Config = cfg
 		}
 	}
-
+	println("ConfigService Instantiated")
 	return configService
 }
