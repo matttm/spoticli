@@ -29,8 +29,8 @@ func GetConfigService() *ConfigService {
 				panic(err)
 			}
 			configService.Config = cfg
+			println("ConfigService Instantiated")
 		}
 	}
-	println("ConfigService Instantiated")
 	return configService
 }
