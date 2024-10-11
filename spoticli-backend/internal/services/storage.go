@@ -38,7 +38,7 @@ func (s *StorageService) GetPresignedUrl(key string) (*v4.PresignedHTTPRequest, 
 	return s.psClient.PresignGetObject(
 		context.TODO(),
 		&s3.GetObjectInput{
-			Bucket: TRACKS_BUCKET_NAME, // TODO: <-- PUT into a config file
+			Bucket: TRACKS_BUCKET_NAME,
 			Key:    aws.String(key),
 		},
 	)
