@@ -9,6 +9,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/mstttm/spoticli/spoticli-backend/internal/models"
 	"github.com/mstttm/spoticli/spoticli-backend/internal/routers"
+	"github.com/rs/cors"
 )
 
 func main() {
@@ -18,9 +19,17 @@ func main() {
 	routers.AttachAudioRouter(r.PathPrefix("/audio").Subrouter())
 
 	http.Handle("/", r)
-	fmt.Println("Listening on locslhost:4200")
+	fmt.Println("Listening on localhost:4200")
+
+	// adding cors for null origin testing
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowCredentials: true,
+	})
+
+	handler := c.Handler(r)
 	printEndpoints(r)
-	err := http.ListenAndServe(":4200", r)
+	err := http.ListenAndServe(":4200", handler)
 	if err != nil {
 		panic(err)
 	}

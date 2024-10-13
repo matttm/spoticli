@@ -23,4 +23,5 @@ require (
 	github.com/aws/smithy-go v1.22.0 // indirect
 	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
+	github.com/rs/cors v1.11.1 // indirect
 )

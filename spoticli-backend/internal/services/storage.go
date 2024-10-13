@@ -43,12 +43,16 @@ func (s *StorageService) GetPresignedUrl(key string) (*v4.PresignedHTTPRequest, 
 		},
 	)
 }
-func (s *StorageService) DownloadFile(key string) (*s3.GetObjectOutput, error) {
+func (s *StorageService) DownloadFile(key string, _range *string) (*s3.GetObjectOutput, error) {
+	input := &s3.GetObjectInput{
+		Bucket: TRACKS_BUCKET_NAME,
+		Key:    aws.String(key),
+	}
+	if _range != nil {
+		input.Range = aws.String(*_range)
+	}
 	return s.client.GetObject(
 		context.TODO(),
-		&s3.GetObjectInput{
-			Bucket: TRACKS_BUCKET_NAME,
-			Key:    aws.String(key),
-		},
+		input,
 	)
 }

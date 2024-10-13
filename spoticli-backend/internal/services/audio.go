@@ -14,7 +14,21 @@ func GetPresignedUrl(key string) (string, error) {
 }
 func GetAudio(key string) ([]byte, error) {
 	svc := GetStorageService()
-	res, err := svc.DownloadFile("bat_country.mp3")
+	// TODO: rewrite and use getaudiopart
+	res, err := svc.DownloadFile("bat_country.mp3", nil)
+	if err != nil {
+		return nil, err
+	}
+	body, err := io.ReadAll(res.Body)
+	defer res.Body.Close()
+	if err != nil {
+		return nil, err
+	}
+	return body, nil
+}
+func GetAudioPart(key, _range string) ([]byte, error) {
+	svc := GetStorageService()
+	res, err := svc.DownloadFile("bat_country.mp3", &_range)
 	if err != nil {
 		return nil, err
 	}

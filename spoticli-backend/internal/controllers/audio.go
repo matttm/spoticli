@@ -22,3 +22,13 @@ func GetAudio(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Write(body)
 }
+
+func GetAudioPart(w http.ResponseWriter, r *http.Request) {
+	println("streaming via proxy")
+	body, err := services.GetAudioPart("bat_country.mp3", "bytes=0-1000")
+	if err != nil {
+		panic(err)
+	}
+	w.Header().Add("Content-type", "audio/mp3")
+	w.Write(body)
+}
