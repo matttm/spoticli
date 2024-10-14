@@ -29,6 +29,6 @@ func GetAudioPart(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	w.Header().Add("Content-type", "audio/mp3")
+	w.Header().Add("Content-Type", "audio/mp3")
 	w.Write(body)
 }

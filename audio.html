@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Button Event Listener</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <button id="myButton">Click Me!</button>
+
+    <script>
+        function convertToArrayBuffer(res) {
+            return res.blob();
+            // var audioData = res.body.getReader();
+            // const buffer = [];
+            // return new Promise((resolve, reject) => {
+            //     function read() {
+            //         return audioData.read().then(({ done, value }) => {
+            //             console.info('audioData read', done, value);
+            //             if (done) {
+            //                 return resolve(new Uint8Array(buffer));
+            //             }
+            //             buffer.push(...value);
+            //             read();
+            //         });
+            //     }
+            //     read();
+            // });
+        }
+        // Select the button
+        const button = document.getElementById('myButton');
+        // Add event listener
+        button.addEventListener('click', function() {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            fetch('http://localhost:4200/audio/proxy/stream/1')
+            .then(convertToArrayBuffer)
+        //     .then(arrayBuffer => {
+        //         console.log('decode', arrayBuffer.buffer)
+        //         return audioCtx.decodeAudioData(arrayBuffer.buffer);
+        // })
+            .then(audioBuffer => {
+                console.log('convert', audioBuffer)
+                // const blob = new Blob([udioBuffer], { type: "audio/mpeg" });
+                // console.log('blob', blob);
+                var url = window.URL.createObjectURL(audioBuffer);
+                const e = new Audio(url);
+                console.log('element', e);
+                e.play();
+                
+                // Create an AudioBufferSourceNode to play the audio
+                // const source = audioCtx.createMediaElementSource(e);
+                // console.log('source', source);
+                // source.connect(audioCtx.destination);
+                // e.play()
+            })
+            .catch(console.log)
+        })
+    </script>
+</body>
+</html>
