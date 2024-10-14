@@ -16,6 +16,6 @@ func GetMusiceService() *MusicService {
 }
 func GetTrack(id int) (*models.Track, error) {
 	t := new(models.Track)
-	t.Title = "bat-country.mp3"
+	t.Title = "bat_country.mp3"
 	return t, nil
 }
