@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/mstttm/spoticli/spoticli-backend/internal/services"
@@ -25,10 +26,12 @@ func GetAudio(w http.ResponseWriter, r *http.Request) {
 
 func GetAudioPart(w http.ResponseWriter, r *http.Request) {
 	println("streaming via proxy")
-	body, err := services.GetAudioPart("bat_country.mp3", "bytes=0-1000")
+	body, length, err := services.GetAudioPart("bat_country.mp3", "bytes=0-1000")
 	if err != nil {
 		panic(err)
 	}
 	w.Header().Add("Content-Type", "audio/mp3")
+	w.Header().Set("Content-Range", fmt.Sprintf("bytes 0-1000/%d", length))
+	w.WriteHeader(http.StatusPartialContent)
 	w.Write(body)
 }

@@ -26,16 +26,16 @@ func GetAudio(key string) ([]byte, error) {
 	}
 	return body, nil
 }
-func GetAudioPart(key, _range string) ([]byte, error) {
+func GetAudioPart(key, _range string) ([]byte, *int64, error) {
 	svc := GetStorageService()
 	res, err := svc.DownloadFile("bat_country.mp3", &_range)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	body, err := io.ReadAll(res.Body)
 	defer res.Body.Close()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return body, nil
+	return body, res.ContentLength, nil
 }
