@@ -9,7 +9,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-// ...
+var DB *sql.DB
 
 func InitializeDatabase() {
 	host := os.Getenv("DB_HOST")
@@ -28,4 +28,16 @@ func InitializeDatabase() {
 	db.SetConnMaxLifetime(time.Minute * 3)
 	db.SetMaxOpenConns(10)
 	db.SetMaxIdleConns(10)
+	DB = db
+}
+
+func CloseDB() error {
+	return DB.Close()
+}
+
+func GetDatabase() *sql.DB {
+	if DB == nil {
+		panic("")
+	}
+	return DB
 }
