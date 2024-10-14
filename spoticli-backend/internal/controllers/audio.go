@@ -3,13 +3,18 @@ package controllers
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
+	"github.com/gorilla/mux"
 	"github.com/mstttm/spoticli/spoticli-backend/internal/services"
 )
 
 func GetPresignedUrl(w http.ResponseWriter, r *http.Request) {
 	println("getting presigned url")
-	url, err := services.GetPresignedUrl("")
+	id, _ := strconv.Atoi(
+		mux.Vars(r)["id"],
+	)
+	url, err := services.GetPresignedUrl(id)
 	if err != nil {
 		panic(err)
 	}
@@ -17,7 +22,10 @@ func GetPresignedUrl(w http.ResponseWriter, r *http.Request) {
 }
 func GetAudio(w http.ResponseWriter, r *http.Request) {
 	println("downloading via proxy")
-	body, err := services.GetAudio("bat_country.mp3")
+	id, _ := strconv.Atoi(
+		mux.Vars(r)["id"],
+	)
+	body, err := services.GetAudio(id)
 	if err != nil {
 		panic(err)
 	}
@@ -26,7 +34,10 @@ func GetAudio(w http.ResponseWriter, r *http.Request) {
 
 func GetAudioPart(w http.ResponseWriter, r *http.Request) {
 	println("streaming via proxy")
-	body, length, err := services.GetAudioPart("bat_country.mp3", "bytes=0-1000000")
+	id, _ := strconv.Atoi(
+		mux.Vars(r)["id"],
+	)
+	body, length, err := services.GetAudioPart(id, "bytes=0-1000000")
 	if err != nil {
 		panic(err)
 	}
