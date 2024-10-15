@@ -1,4 +1,4 @@
-module github.com/mstttm/spoticli/spoticli-backend
+module github.com/matttm/spoticli/spoticli-backend
 
 go 1.23.1
 

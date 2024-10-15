@@ -45,7 +45,12 @@
         // Add event listener
         button.addEventListener('click', function() {
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            fetch('http://localhost:4200/audio/proxy/stream/1')
+            fetch('http://localhost:4200/audio/proxy/stream/1', {
+                method: 'GET', 
+                headers: {
+                    'Range': 'bytes=0-1000000'
+                }
+            })
             .then(convertToArrayBuffer)
         //     .then(arrayBuffer => {
         //         console.log('decode', arrayBuffer.buffer)

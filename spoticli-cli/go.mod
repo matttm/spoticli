@@ -1,3 +1,3 @@
-module github.com/mstttm/spoticli/spoticli-cli
+module github.com/matttm/spoticli/spoticli-cli
 
 go 1.23.1
