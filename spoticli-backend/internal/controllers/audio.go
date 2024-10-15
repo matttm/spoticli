@@ -37,12 +37,24 @@ func GetAudioPart(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(
 		mux.Vars(r)["id"],
 	)
-	body, length, err := services.GetAudioPart(id, "bytes=0-1000000")
+	rangeStr := r.Header["Range"][0]
+	var start, end int64
+	_, err := fmt.Sscan("bytes=%s-%s", rangeStr, start, end)
+	// TODO: ensure end not gt file size
+	body, length, err := services.GetAudioPart(id, rangeStr)
 	if err != nil {
 		panic(err)
 	}
 	w.Header().Add("Content-Type", "audio/mp3")
-	w.Header().Set("Content-Range", fmt.Sprintf("bytes 0-1000000/%d", length))
+	w.Header().Set(
+		"Content-Range",
+		fmt.Sprintf(
+			"bytes %d-%d/%d",
+			start,
+			end,
+			length,
+		),
+	)
 	w.WriteHeader(http.StatusPartialContent)
 	w.Write(body)
 }
