@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/mstttm/spoticli/spoticli-backend/internal/models"
-	"github.com/mstttm/spoticli/spoticli-backend/internal/routers"
+	"github.com/matttm/spoticli/spoticli-backend/internal/routers"
+	"github.com/matttm/spoticli/spoticli-models"
 	"github.com/rs/cors"
 )
 
