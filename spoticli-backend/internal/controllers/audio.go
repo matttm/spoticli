@@ -39,7 +39,7 @@ func GetAudioPart(w http.ResponseWriter, r *http.Request) {
 	)
 	rangeStr := r.Header["Range"][0]
 	var start, end int64
-	_, err := fmt.Sscan("bytes=%s-%s", rangeStr, start, end)
+	_, err := fmt.Sscan("bytes=%d-%d", rangeStr, start, end)
 	// TODO: ensure end not gt file size
 	body, length, err := services.GetAudioPart(id, rangeStr)
 	if err != nil {
