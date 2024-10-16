@@ -1,3 +1,3 @@
 package config
 
-const SERVER_URl = "http://localhost:3001"
+const SERVER_URL = "http://localhost:3001"
