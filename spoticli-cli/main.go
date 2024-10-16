@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -12,12 +11,52 @@ func main() {
 	app := &cli.App{
 		Commands: []*cli.Command{
 			{
-				Name:    "add",
-				Aliases: []string{"a"},
-				Usage:   "add a task to the list",
-				Action: func(cCtx *cli.Context) error {
-					fmt.Println("added task: ", cCtx.Args().First())
-					return nil
+				Name:    "auth",
+				Aliases: []string{},
+				Usage:   "authentication",
+				Subcommands: []*cli.Command{
+					{
+						Name:  "login",
+						Usage: "authenticate yourself",
+						Action: func(cCtx *cli.Context) error {
+							return nil
+						},
+					},
+					{
+						Name:  "logout",
+						Usage: "revoke self-authentication",
+						Action: func(cCtx *cli.Context) error {
+							return nil
+						},
+					},
+				},
+			},
+			{
+				Name:    "song",
+				Aliases: []string{},
+				Usage:   "song <action>",
+				Subcommands: []*cli.Command{
+					{
+						Name:  "ls",
+						Usage: "ls",
+						Action: func(cCtx *cli.Context) error {
+							return nil
+						},
+					},
+					{
+						Name:  "play",
+						Usage: "play <song-title>",
+						Action: func(cCtx *cli.Context) error {
+							return nil
+						},
+					},
+					{
+						Name:  "download",
+						Usage: "download <song-title>",
+						Action: func(cCtx *cli.Context) error {
+							return nil
+						},
+					},
 				},
 			},
 		},
