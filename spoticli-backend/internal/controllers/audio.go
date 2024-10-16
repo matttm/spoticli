@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
-	"github.com/mstttm/spoticli/spoticli-backend/internal/services"
+	"github.com/matttm/spoticli/spoticli-backend/internal/services"
 )
 
 func GetPresignedUrl(w http.ResponseWriter, r *http.Request) {

@@ -1,6 +1,8 @@
 package services
 
-import "github.com/mstttm/spoticli/spoticli-backend/internal/models"
+import (
+	"github.com/matttm/spoticli/spoticli-models"
+)
 
 type MusicService struct {
 }

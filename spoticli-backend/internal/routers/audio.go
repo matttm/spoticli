@@ -2,7 +2,7 @@ package routers
 
 import (
 	"github.com/gorilla/mux"
-	"github.com/mstttm/spoticli/spoticli-backend/internal/controllers"
+	"github.com/matttm/spoticli/spoticli-backend/internal/controllers"
 )
 
 func AttachAudioRouter(audio *mux.Router) *mux.Router {

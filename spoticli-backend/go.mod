@@ -3,7 +3,7 @@ module github.com/matttm/spoticli/spoticli-backend
 go 1.23.1
 
 require (
-	github.com/matttm/spoticli/spoticli-models v1.23.1
+	github.com/matttm/spoticli/spoticli-models v0.0.0
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.32.0 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.6.6 // indirect
