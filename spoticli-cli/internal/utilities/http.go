@@ -9,7 +9,10 @@ import (
 )
 
 func GetBytesBackend(args ...interface{}) ([]byte, error) {
-	args = append([]interface{ config.SERVER_URL }, args)
+	var t interface{} = config.SERVER_URL
+	slice := make([]interface{}, 1)
+	slice[0] = t
+	args = append(slice, args)
 	req, err := http.NewRequest(
 		http.MethodGet,
 		fmt.Sprintf("http://%s/%s", args...),
@@ -25,6 +28,6 @@ func GetBytesBackend(args ...interface{}) ([]byte, error) {
 	return b, nil
 }
 
-func getClient() http.Client {
-	return http.Client{}
+func getClient() *http.Client {
+	return new(http.Client)
 }
