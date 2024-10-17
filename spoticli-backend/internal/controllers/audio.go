@@ -25,10 +25,12 @@ func GetAudio(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(
 		mux.Vars(r)["id"],
 	)
-	body, err := services.GetAudio(id)
+	body, length, err := services.GetAudio(id)
 	if err != nil {
 		panic(err)
 	}
+	w.Header().Add("Content-Type", "audio/mp3")
+	w.Header().Add("Content-Length", strconv.FormatInt(*length, 10))
 	w.Write(body)
 }
 
