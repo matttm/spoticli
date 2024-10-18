@@ -30,6 +30,7 @@ func GetAudio(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	w.Header().Add("Content-Type", "audio/mp3")
+	// NOTE: when you don't attach a content-length header, the server uses transfer-encoding chunked, which is a form of streaming
 	w.Header().Add("Content-Length", strconv.FormatInt(*length, 10))
 	w.Write(body)
 }

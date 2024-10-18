@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/matttm/spoticli/spoticli-cli/internal/handler"
 	"github.com/urfave/cli/v2"
 )
 
@@ -54,6 +55,7 @@ func main() {
 						Name:  "download",
 						Usage: "download <song-title>",
 						Action: func(cCtx *cli.Context) error {
+							handler.DownloadSong("")
 							return nil
 						},
 					},
