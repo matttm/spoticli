@@ -8,7 +8,7 @@ import (
 	"github.com/matttm/spoticli/spoticli-cli/internal/config"
 )
 
-func GetBytesBackend(args ...interface{}) ([]byte, error) {
+func GetBytesBackend(headerCb func(*http.Request), args ...interface{}) ([]byte, error) {
 	var t interface{} = config.SERVER_URL
 	slice := make([]interface{}, 1)
 	slice[0] = t
@@ -21,6 +21,9 @@ func GetBytesBackend(args ...interface{}) ([]byte, error) {
 	)
 	if err != nil {
 		panic(err)
+	}
+	if headerCb != nil {
+		headerCb(req)
 	}
 	res, err := getClient().Do(req)
 	if err != nil {

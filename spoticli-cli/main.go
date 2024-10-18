@@ -48,6 +48,7 @@ func main() {
 						Name:  "play",
 						Usage: "play <song-title>",
 						Action: func(cCtx *cli.Context) error {
+							handler.StreamSong("")
 							return nil
 						},
 					},
