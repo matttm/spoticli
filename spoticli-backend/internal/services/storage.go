@@ -26,7 +26,7 @@ func GetStorageService() *StorageService {
 		defer storageLock.Unlock()
 		if storageService == nil {
 			storageService = &StorageService{}
-			storageService.client = s3.NewFromConfig(GetConfigService().Config)
+			storageService.client = s3.NewFromConfig(GetConfigService().CloudConfig)
 			storageService.psClient = s3.NewPresignClient(storageService.client)
 			println("StorageService Instantiated")
 		}

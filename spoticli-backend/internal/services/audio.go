@@ -1,6 +1,8 @@
 package services
 
 import (
+	"errors"
+	"fmt"
 	"io"
 )
 
@@ -44,4 +46,23 @@ func GetAudioPart(id int, _range string) ([]byte, *int64, error) {
 		return nil, nil, err
 	}
 	return body, res.ContentLength, nil
+}
+func StreamAudioSegment(id int, start, end int) ([]byte, *int64, *int, error) {
+	t, _ := GetTrack(id)
+	filesize := t.FileSize
+	// key := t.Title
+	if start == 0 {
+		end = GetConfigValue[int]("STREAM_SEGMENT_SIZE")
+	}
+	if start >= end || end > filesize {
+		return nil, nil, nil, errors.New("Invalid range header")
+	}
+	body, length, err := GetAudioPart(
+		id,
+		fmt.Sprintf("bytes=%d-%d", start, end),
+	)
+	if err != nil {
+		panic(err)
+	}
+	return body, length, &filesize, nil
 }
