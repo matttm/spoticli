@@ -47,7 +47,7 @@ func GetAudioPart(w http.ResponseWriter, r *http.Request) {
 		end = 0
 	} else {
 		rangeStr := r.Header["Range"][0]
-		_, err := fmt.Sscan("bytes=%d-%d", rangeStr, start, end)
+		_, err := fmt.Sscanf(rangeStr, "bytes=%d-%d", &start, &end)
 		if err != nil {
 			panic(err)
 		}
