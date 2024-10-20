@@ -1,20 +1,17 @@
 package utilities
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"net/http"
-	"time"
 
 	"github.com/gopxl/beep/v2"
 	"github.com/gopxl/beep/v2/mp3"
-	"github.com/gopxl/beep/v2/speaker"
 	"github.com/matttm/spoticli/spoticli-cli/internal/config"
 	"github.com/matttm/spoticli/spoticli-cli/internal/models"
 )
 
-func GetBytesBackend(headerCb func(*http.Request), seg *models.AudioSegment, args ...interface{}) ([]byte, error) {
+func GetBytesOpenReader(headerCb func(*http.Request), seg *models.AudioSegment, args ...interface{}) io.ReadCloser {
 	var t interface{} = config.SERVER_URL
 	slice := make([]interface{}, 1)
 	slice[0] = t
@@ -41,16 +38,19 @@ func GetBytesBackend(headerCb func(*http.Request), seg *models.AudioSegment, arg
 	if err != nil {
 		panic(err)
 	}
-	var data []byte
-	data, err = io.ReadAll(res.Body)
+	return res.Body
+}
+func GetBytesBackend(headerCb func(*http.Request), seg *models.AudioSegment, args ...interface{}) ([]byte, error) {
+	body := GetBytesOpenReader(headerCb, seg, args...)
+	data, err := io.ReadAll(body)
 	if err != nil {
 		panic(err)
 	}
-	defer res.Body.Close()
+	defer body.Close()
 	return data, nil
 }
 func GetBufferedAudioSegment(id int, seg *models.AudioSegment) (beep.StreamSeekCloser, beep.Format) {
-	b, _ := GetBytesBackend(
+	dataStream := GetBytesOpenReader(
 		func(r *http.Request) {
 			// TODO: REMOVE HEADER ON FIRST SEND
 			if seg.StartByte != 0 {
@@ -63,14 +63,10 @@ func GetBufferedAudioSegment(id int, seg *models.AudioSegment) (beep.StreamSeekC
 		seg,
 		fmt.Sprintf("audio/proxy/stream/%d", id),
 	)
-	fmt.Print(b)
-	r := bytes.NewReader(b)
-	closer := io.NopCloser(r)
-	streamer, format, err := mp3.Decode(closer)
+	streamer, format, err := mp3.Decode(dataStream)
 	if err != nil {
 		panic(err)
 	}
-	speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
 	return streamer, format
 }
 

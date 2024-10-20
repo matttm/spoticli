@@ -20,38 +20,43 @@ func DownloadSong(title string) error {
 	return nil
 }
 func StreamSong(title string) error {
+	sr := beep.SampleRate(44100)
+	speaker.Init(sr, sr.N(time.Second/10))
+
+	// A zero Queue is an empty Queue.
+	var queue models.AudioSegmentQueue
+	speaker.Play(&queue)
+
 	// creating struct to follow boundaries
-	seg := models.AudioSegment{StartByte: 0, EndByte: 0, TotalBytes: 0}
-	streamer, format := utilities.GetBufferedAudioSegment(1, &seg) // this function call has a side affect on seg
-	buffer := beep.NewBuffer(format)
-	buffer.Append(streamer)
+	seg := models.AudioSegment{StartByte: 0, EndByte: -1, TotalBytes: 0}
+	var streamer beep.StreamSeekCloser
+	var format beep.Format
 	// then perform loop for remainder of song
 	ticker := time.NewTicker(time.Second * 15)
-	done := make(chan int)
 	go func() {
-		for {
-			select {
-			case <-ticker.C:
-				// make seg point to next desired segment
-				delta := seg.EndByte - seg.StartByte
-				seg.StartByte = seg.EndByte + 1
-				seg.EndByte = min(seg.StartByte+delta, seg.TotalBytes)
-				streamer, _ = utilities.GetBufferedAudioSegment(1, &seg) // this function call has a side affect on seg
-				buffer.Append(streamer)
-				if seg.EndByte == seg.TotalBytes {
-					return
-				}
-
-			case <-done:
-				ticker.Stop()
+		for ; ; <-ticker.C {
+			if seg.EndByte >= seg.TotalBytes {
 				return
 			}
+			streamer, format = utilities.GetBufferedAudioSegment(1, &seg) // this function call has a side affect on seg
+
+			// The speaker's sample rate is fixed at 44100. Therefore, we need to
+			// resample the file in case it's in a different sample rate.
+			resampled := beep.Resample(4, format.SampleRate, sr, streamer)
+
+			// And finally, we add the song to the queue.
+			speaker.Lock()
+			queue.Add(resampled)
+			speaker.Unlock()
+			// make seg point to next desired segment
+			delta := seg.EndByte - seg.StartByte
+			seg.StartByte = seg.EndByte + 1
+			seg.EndByte = min(seg.StartByte+delta, seg.TotalBytes)
+
 		}
 	}()
 
-	shot := buffer.Streamer(0, buffer.Len())
-	streamer.Close() // TODO: ENSURE ALL STREAMERS CLOSED
-	speaker.Play(shot)
 	select {}
+	ticker.Stop()
 	return nil
 }
