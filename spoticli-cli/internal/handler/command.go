@@ -4,8 +4,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/faiface/beep"
-	"github.com/faiface/beep/speaker"
+	"github.com/gopxl/beep/v2"
+	"github.com/gopxl/beep/v2/speaker"
 	"github.com/matttm/spoticli/spoticli-cli/internal/models"
 	"github.com/matttm/spoticli/spoticli-cli/internal/utilities"
 )
