@@ -40,10 +40,18 @@ func GetAudioPart(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(
 		mux.Vars(r)["id"],
 	)
-	// TODO: ADD CHECK FOR IF RANGE NOT GIVEN (ASSUME 0?)
-	rangeStr := r.Header["Range"][0]
+	// NOTE: if there's no header, must be trying to get first bytes
 	var start, end int
-	_, err := fmt.Sscan("bytes=%d-%d", rangeStr, start, end)
+	if len(r.Header["Range"]) == 0 {
+		start = 0
+		end = 0
+	} else {
+		rangeStr := r.Header["Range"][0]
+		_, err := fmt.Sscan("bytes=%d-%d", rangeStr, start, end)
+		if err != nil {
+			panic(err)
+		}
+	}
 	// TODO: ensure end not gt file size
 	body, length, fileSize, err := services.StreamAudioSegment(id, &start, &end)
 	if err != nil {
