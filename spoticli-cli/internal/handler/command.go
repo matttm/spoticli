@@ -31,6 +31,7 @@ func StreamSong(title string) error {
 	seg := models.AudioSegment{StartByte: 0, EndByte: -1, TotalBytes: 0}
 	var streamer beep.StreamSeekCloser
 	var format beep.Format
+	var header []byte = []byte{} //TODO: research tcolgate/mp3 as an alternative to gopxl/beep
 	// then perform loop for remainder of song
 	ticker := time.NewTicker(time.Second * 15)
 	go func() {
@@ -38,7 +39,7 @@ func StreamSong(title string) error {
 			if seg.EndByte >= seg.TotalBytes {
 				return
 			}
-			streamer, format = utilities.GetBufferedAudioSegment(1, &seg) // this function call has a side affect on seg
+			header, streamer, format = utilities.GetBufferedAudioSegment(header, 1, &seg) // this function call has a side affect on seg
 
 			// The speaker's sample rate is fixed at 44100. Therefore, we need to
 			// resample the file in case it's in a different sample rate.

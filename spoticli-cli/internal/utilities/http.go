@@ -1,6 +1,7 @@
 package utilities
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"net/http"
@@ -49,8 +50,8 @@ func GetBytesBackend(headerCb func(*http.Request), seg *models.AudioSegment, arg
 	defer body.Close()
 	return data, nil
 }
-func GetBufferedAudioSegment(id int, seg *models.AudioSegment) (beep.StreamSeekCloser, beep.Format) {
-	dataStream := GetBytesOpenReader(
+func GetBufferedAudioSegment(header []byte, id int, seg *models.AudioSegment) ([]byte, beep.StreamSeekCloser, beep.Format) {
+	data, _ := GetBytesBackend(
 		func(r *http.Request) {
 			// TODO: REMOVE HEADER ON FIRST SEND
 			if seg.StartByte != 0 {
@@ -63,11 +64,18 @@ func GetBufferedAudioSegment(id int, seg *models.AudioSegment) (beep.StreamSeekC
 		seg,
 		fmt.Sprintf("audio/proxy/stream/%d", id),
 	)
+	if len(header) != 0 {
+		data = append(header, data...)
+	} else {
+		header = data[:128] // rip off mp3 header + ID3v1 heder
+	}
+	reader := bytes.NewReader(data)
+	dataStream := io.NopCloser(reader)
 	streamer, format, err := mp3.Decode(dataStream)
 	if err != nil {
 		panic(err)
 	}
-	return streamer, format
+	return header, streamer, format
 }
 
 func getClient() *http.Client {
