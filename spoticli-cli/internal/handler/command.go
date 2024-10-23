@@ -11,16 +11,22 @@ import (
 	"github.com/matttm/spoticli/spoticli-cli/internal/utilities"
 )
 
-func DownloadSong(title string) error {
+func DownloadSong(id string) error {
 	seg := models.AudioSegment{StartByte: 0, EndByte: 0, TotalBytes: 0}
-	b, _ := utilities.GetBytesBackend(nil, &seg, "audio/proxy/1")
+	b, _ := utilities.GetBytesBackend(
+		nil,
+		&seg,
+		fmt.Sprintf("audio/proxy/%s", id),
+	)
 	// path := "~/Downloads/spoticli"
 	// _ = os.MkdirAll(path, 0664)
 	// filePath := fmt.Sprintf("%s/%s", path, "test.mp3")
 	os.WriteFile("test.mp3", b, 0664)
 	return nil
 }
-func StreamSong(title string) error {
+func StreamSong(id string) error {
+	id = "1"
+	fmt.Println(id)
 	sr := beep.SampleRate(44100)
 	speaker.Init(sr, sr.N(time.Second/10))
 
@@ -39,7 +45,7 @@ func StreamSong(title string) error {
 			if seg.EndByte > seg.TotalBytes {
 				return
 			}
-			header, streamer, _ = utilities.GetBufferedAudioSegment(header, 1, &seg) // this function call has a side affect on seg
+			header, streamer, _ = utilities.GetBufferedAudioSegment(header, id, &seg) // this function call has a side affect on seg
 
 			// The speaker's sample rate is fixed at 44100. Therefore, we need to
 			// resample the file in case it's in a different sample rate.

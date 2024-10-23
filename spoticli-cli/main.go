@@ -48,7 +48,7 @@ func main() {
 						Name:  "play",
 						Usage: "play <song-title>",
 						Action: func(cCtx *cli.Context) error {
-							handler.StreamSong("")
+							handler.StreamSong("1")
 							return nil
 						},
 					},
@@ -56,7 +56,7 @@ func main() {
 						Name:  "download",
 						Usage: "download <song-title>",
 						Action: func(cCtx *cli.Context) error {
-							handler.DownloadSong("")
+							handler.DownloadSong("1")
 							return nil
 						},
 					},

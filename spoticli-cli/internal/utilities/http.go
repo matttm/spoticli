@@ -50,7 +50,7 @@ func GetBytesBackend(headerCb func(*http.Request), seg *models.AudioSegment, arg
 	defer body.Close()
 	return data, nil
 }
-func GetBufferedAudioSegment(header []byte, id int, seg *models.AudioSegment) ([]byte, beep.StreamSeekCloser, beep.Format) {
+func GetBufferedAudioSegment(header []byte, id string, seg *models.AudioSegment) ([]byte, beep.StreamSeekCloser, beep.Format) {
 	data, _ := GetBytesBackend(
 		func(r *http.Request) {
 			// TODO: REMOVE HEADER ON FIRST SEND
@@ -62,7 +62,7 @@ func GetBufferedAudioSegment(header []byte, id int, seg *models.AudioSegment) ([
 			}
 		},
 		seg,
-		fmt.Sprintf("audio/proxy/stream/%d", id),
+		fmt.Sprintf("audio/proxy/stream/%s", id),
 	)
 	if len(header) != 0 {
 		var copyHeader [128]byte
