@@ -1,6 +1,6 @@
 # spoticli
 
-Development:
+Development: Active
 
 ## Description
 
