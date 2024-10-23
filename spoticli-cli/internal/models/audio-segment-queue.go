@@ -1,13 +1,19 @@
 package models
 
-import "github.com/gopxl/beep/v2"
+import (
+	"fmt"
+
+	"github.com/gopxl/beep/v2"
+)
 
 type AudioSegmentQueue struct {
-	streamers []beep.Streamer
+	segmentCtr int // number representing which segment number is being played
+	streamers  []beep.Streamer
 }
 
 func (q *AudioSegmentQueue) Add(streamers ...beep.Streamer) {
 	q.streamers = append(q.streamers, streamers...)
+	fmt.Printf("%d segments in queue\n", len(q.streamers))
 }
 
 func (q *AudioSegmentQueue) Stream(samples [][2]float64) (n int, ok bool) {
@@ -30,6 +36,8 @@ func (q *AudioSegmentQueue) Stream(samples [][2]float64) (n int, ok bool) {
 		// the next streamer.
 		if !ok {
 			q.streamers = q.streamers[1:]
+			q.segmentCtr += 1
+			fmt.Printf("segment %d has been dequeued with %d samples left in current segment and %d segments in queue\n", q.segmentCtr, n, len(q.streamers))
 		}
 		// We update the number of filled samples.
 		filled += n

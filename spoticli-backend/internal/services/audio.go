@@ -55,7 +55,7 @@ func StreamAudioSegment(id int, start, end *int) ([]byte, *int64, *int, error) {
 		*end = GetConfigValue[int]("STREAM_SEGMENT_SIZE")
 	}
 	// TODO: PUT START/END VALIDATION IN A VALIDATOR
-	fmt.Printf("start %d, end %d", *start, *end)
+	fmt.Printf("start %d, end %d\n", *start, *end)
 	if *start >= *end || *end > filesize {
 		return nil, nil, nil, errors.New("Invalid range header")
 	}

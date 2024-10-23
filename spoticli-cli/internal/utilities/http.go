@@ -65,7 +65,11 @@ func GetBufferedAudioSegment(header []byte, id int, seg *models.AudioSegment) ([
 		fmt.Sprintf("audio/proxy/stream/%d", id),
 	)
 	if len(header) != 0 {
-		data = append(header, data...)
+		var copyHeader [128]byte
+		for i := range header {
+			copyHeader[i] = header[i]
+		}
+		data = append(copyHeader[:], data...)
 	} else {
 		header = data[:128] // rip off mp3 header + ID3v1 heder
 	}

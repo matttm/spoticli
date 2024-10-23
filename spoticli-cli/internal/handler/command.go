@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -30,24 +31,24 @@ func StreamSong(title string) error {
 	// creating struct to follow boundaries
 	seg := models.AudioSegment{StartByte: 0, EndByte: -1, TotalBytes: 0}
 	var streamer beep.StreamSeekCloser
-	var format beep.Format
 	var header []byte = []byte{} //TODO: research tcolgate/mp3 as an alternative to gopxl/beep
 	// then perform loop for remainder of song
 	ticker := time.NewTicker(time.Second * 15)
 	go func() {
 		for ; ; <-ticker.C {
-			if seg.EndByte >= seg.TotalBytes {
+			if seg.EndByte > seg.TotalBytes {
 				return
 			}
-			header, streamer, format = utilities.GetBufferedAudioSegment(header, 1, &seg) // this function call has a side affect on seg
+			header, streamer, _ = utilities.GetBufferedAudioSegment(header, 1, &seg) // this function call has a side affect on seg
 
 			// The speaker's sample rate is fixed at 44100. Therefore, we need to
 			// resample the file in case it's in a different sample rate.
-			resampled := beep.Resample(4, format.SampleRate, sr, streamer)
+			// resampled := beep.Resample(4, format.SampleRate, sr, streamer)
+			fmt.Printf("start %d end %d\n", seg.StartByte, seg.EndByte)
 
 			// And finally, we add the song to the queue.
 			speaker.Lock()
-			queue.Add(resampled)
+			queue.Add(streamer)
 			speaker.Unlock()
 			// make seg point to next desired segment
 			delta := seg.EndByte - seg.StartByte
