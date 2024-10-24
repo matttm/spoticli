@@ -50,7 +50,7 @@ func StreamSong(id string) error {
 			// The speaker's sample rate is fixed at 44100. Therefore, we need to
 			// resample the file in case it's in a different sample rate.
 			// resampled := beep.Resample(4, format.SampleRate, sr, streamer)
-			fmt.Printf("start %d end %d\n", seg.StartByte, seg.EndByte)
+			fmt.Printf("start %d -- end %d -- total %d\n", seg.StartByte, seg.EndByte, seg.TotalBytes)
 
 			// And finally, we add the song to the queue.
 			speaker.Lock()
