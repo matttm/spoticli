@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -20,6 +21,7 @@ func main() {
 						Name:  "login",
 						Usage: "authenticate yourself",
 						Action: func(cCtx *cli.Context) error {
+							fmt.Println("Feature not implemented")
 							return nil
 						},
 					},
@@ -27,6 +29,7 @@ func main() {
 						Name:  "logout",
 						Usage: "revoke self-authentication",
 						Action: func(cCtx *cli.Context) error {
+							fmt.Println("Feature not implemented")
 							return nil
 						},
 					},
@@ -41,6 +44,7 @@ func main() {
 						Name:  "ls",
 						Usage: "ls",
 						Action: func(cCtx *cli.Context) error {
+							fmt.Println("Feature not implemented")
 							return nil
 						},
 					},

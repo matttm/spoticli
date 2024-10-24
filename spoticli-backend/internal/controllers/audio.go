@@ -57,8 +57,8 @@ func GetAudioPart(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(*length)
-	fmt.Println(*fileSize)
+	fmt.Printf("ContentLength %d\n", *length)
+	fmt.Printf("FileSize %d\n", *fileSize)
 	w.Header().Add("Content-Type", "audio/mp3")
 	w.Header().Add("Content-Length", strconv.FormatInt(*length, 10))
 	w.Header().Set(

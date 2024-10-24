@@ -36,6 +36,7 @@ func GetAudioPart(id int, _range string) ([]byte, *int64, error) {
 	t, _ := GetTrack(id)
 	key := t.Title
 	svc := GetStorageService()
+	// TODO: put file in redis
 	res, err := svc.DownloadFile(key, &_range)
 	if err != nil {
 		return nil, nil, err
@@ -45,6 +46,7 @@ func GetAudioPart(id int, _range string) ([]byte, *int64, error) {
 	if err != nil {
 		return nil, nil, err
 	}
+	fmt.Printf("Content-Range from AWS %s\n", *res.ContentRange)
 	return body, res.ContentLength, nil
 }
 func StreamAudioSegment(id int, start, end *int) ([]byte, *int64, *int, error) {
@@ -55,8 +57,8 @@ func StreamAudioSegment(id int, start, end *int) ([]byte, *int64, *int, error) {
 		*end = GetConfigValue[int]("STREAM_SEGMENT_SIZE")
 	}
 	// TODO: PUT START/END VALIDATION IN A VALIDATOR
-	fmt.Printf("start %d, end %d\n", *start, *end)
-	if *start >= *end || *end > filesize {
+	fmt.Printf("start %d, end %d, filesize %d\n", *start, *end, filesize)
+	if *start >= *end || *end > filesize+1 {
 		return nil, nil, nil, errors.New("Invalid range header")
 	}
 	body, length, err := GetAudioPart(

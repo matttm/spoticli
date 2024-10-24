@@ -42,9 +42,6 @@ func StreamSong(id string) error {
 	ticker := time.NewTicker(time.Second * 15)
 	go func() {
 		for ; ; <-ticker.C {
-			if seg.EndByte > seg.TotalBytes {
-				return
-			}
 			header, streamer, _ = utilities.GetBufferedAudioSegment(header, id, &seg) // this function call has a side affect on seg
 
 			// The speaker's sample rate is fixed at 44100. Therefore, we need to
@@ -56,10 +53,13 @@ func StreamSong(id string) error {
 			speaker.Lock()
 			queue.Add(streamer)
 			speaker.Unlock()
+			if seg.EndByte == seg.TotalBytes {
+				return
+			}
 			// make seg point to next desired segment
 			delta := seg.EndByte - seg.StartByte
-			seg.StartByte = seg.EndByte + 1
-			seg.EndByte = min(seg.StartByte+delta, seg.TotalBytes)
+			seg.StartByte = seg.EndByte
+			seg.EndByte = min(seg.StartByte+delta, seg.TotalBytes+1)
 
 		}
 	}()
