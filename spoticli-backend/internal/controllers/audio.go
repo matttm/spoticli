@@ -1,3 +1,5 @@
+// Package controllers is where the main parsing of headers
+// is done and passed to the corresponding service
 package controllers
 
 import (
@@ -9,6 +11,8 @@ import (
 	"github.com/matttm/spoticli/spoticli-backend/internal/services"
 )
 
+// GetPresignedUrl gets a presigned url for an object in s3
+// to be downloaded.
 func GetPresignedUrl(w http.ResponseWriter, r *http.Request) {
 	println("getting presigned url")
 	id, _ := strconv.Atoi(
@@ -20,6 +24,8 @@ func GetPresignedUrl(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Write([]byte(url))
 }
+
+// GetAudio gets the bytes of an entire object in s3
 func GetAudio(w http.ResponseWriter, r *http.Request) {
 	println("downloading via proxy")
 	id, _ := strconv.Atoi(
@@ -35,6 +41,16 @@ func GetAudio(w http.ResponseWriter, r *http.Request) {
 	w.Write(body)
 }
 
+// GetAudioPart gets a requested segmenyt of an object in s3
+//
+// The range being requested is to be specified by the \'Range\'
+// header which will have a value like "bytes=0-1000000"
+//
+// # The response's body will contain a portion of bytes
+//
+// The response's body may or may not be the range specified
+// and will be specified by the 'Content-Range' headerof the
+// response, in the format od "bytes 0-10000/293872"
 func GetAudioPart(w http.ResponseWriter, r *http.Request) {
 	println("streaming via proxy")
 	id, _ := strconv.Atoi(

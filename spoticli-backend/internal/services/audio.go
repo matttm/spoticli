@@ -1,3 +1,4 @@
+// Package services
 package services
 
 import (
@@ -6,6 +7,8 @@ import (
 	"io"
 )
 
+// GetPresignedUrl gets a presigned url
+// for downloading an object from s3
 func GetPresignedUrl(id int) (string, error) {
 	t, _ := GetTrack(id)
 	key := t.Title
@@ -16,6 +19,10 @@ func GetPresignedUrl(id int) (string, error) {
 	}
 	return req.URL, nil
 }
+
+// GetAudio gets a io.Reader containing an entire
+// audio object on success and a *int referring to
+// content's size
 func GetAudio(id int) ([]byte, *int64, error) {
 	t, _ := GetTrack(id)
 	key := t.Title
