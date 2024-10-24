@@ -9,7 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
-// / TODO: use go:generate to make singleton
+// A StorageService interacts directly with s3
 type StorageService struct {
 	client   *s3.Client
 	psClient *s3.PresignClient
@@ -34,6 +34,7 @@ func GetStorageService() *StorageService {
 	return storageService
 }
 
+// GetPresignedUrl invokes presigned GetObject cmd
 func (s *StorageService) GetPresignedUrl(key string) (*v4.PresignedHTTPRequest, error) {
 	return s.psClient.PresignGetObject(
 		context.TODO(),
@@ -43,6 +44,8 @@ func (s *StorageService) GetPresignedUrl(key string) (*v4.PresignedHTTPRequest, 
 		},
 	)
 }
+
+// DownloadFile invokes GetObject command with a range if provided
 func (s *StorageService) DownloadFile(key string, _range *string) (*s3.GetObjectOutput, error) {
 	input := &s3.GetObjectInput{
 		Bucket: TRACKS_BUCKET_NAME,

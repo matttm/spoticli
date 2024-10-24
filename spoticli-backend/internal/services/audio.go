@@ -39,7 +39,12 @@ func GetAudio(id int) ([]byte, *int64, error) {
 	}
 	return body, res.ContentLength, nil
 }
-func GetAudioPart(id int, _range string) ([]byte, *int64, error) {
+
+// getAudioPart is a helper function in services which
+// invokes the downloading and turning the reader into bytexs
+//
+// _range input, must be in the form "bytes=<start>-<end>"
+func getAudioPart(id int, _range string) ([]byte, *int64, error) {
 	t, _ := GetTrack(id)
 	key := t.Title
 	svc := GetStorageService()
@@ -68,7 +73,7 @@ func StreamAudioSegment(id int, start, end *int) ([]byte, *int64, *int, error) {
 	if *start >= *end || *end > filesize+1 {
 		return nil, nil, nil, errors.New("Invalid range header")
 	}
-	body, length, err := GetAudioPart(
+	body, length, err := getAudioPart(
 		id,
 		fmt.Sprintf("bytes=%d-%d", *start, *end),
 	)

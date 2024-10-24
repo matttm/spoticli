@@ -12,6 +12,9 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 )
 
+//	A ConfigService manages configuratio
+//
+// needed for services and environment vars
 type ConfigService struct {
 	CloudConfig aws.Config
 	Config      map[string]interface{}
@@ -39,6 +42,8 @@ func GetConfigService() *ConfigService {
 	}
 	return configService
 }
+
+// GetConfigValue gets an config var
 func GetConfigValue[T any](k string) T {
 	return GetConfigService().Config[k].(T) // type assertion
 }
