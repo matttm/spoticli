@@ -37,6 +37,11 @@ func GetAudio(id int) ([]byte, *int64, error) {
 	if err != nil {
 		return nil, nil, err
 	}
+	// the following  blobk is in testing TODO:
+	body = ReadID3v2Header(body)
+	frames := PartitionMp3Frames(body)
+	fmt.Printf("after partition: %v\n", frames)
+	// end test NOTE:
 	return body, res.ContentLength, nil
 }
 

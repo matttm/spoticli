@@ -3,9 +3,8 @@ package services
 import (
 	"bytes"
 	"encoding/hex"
-	"io"
 
-	"github.com/matttm/spoticli/spoticli-models"
+	models "github.com/matttm/spoticli/spoticli-models"
 )
 
 type MediaService struct {
@@ -27,16 +26,35 @@ func GetTrack(id int) (*models.Track, error) {
 	return t, nil
 }
 
-func ReadID3vsHeader(r io.Reader) []byte {
-	identifier := make([]byte, 3)
-	n, err := r.Read(identifier)
-	if err != nil {
-	}
+// ReadID3v2Header takes a []byte and returns a
+// []byte without an ID3 header
+func ReadID3v2Header(b []byte) []byte {
 	idString := "ID3"
-	decodedId, err := hex.DecodeString(idString)
-	if err != nil {
-	}
-	if !bytes.Equal(identifier, decodedId) {
+	identifier := b[:3]
+	if !bytes.Equal(identifier, []byte(idString)) {
 		panic("No ID3 indicator found")
 	}
+	syncStart, err := hex.DecodeString("FFE")
+	if err != nil {
+		panic(err)
+	}
+	index := bytes.Index(b, syncStart)
+	if index < 0 {
+		panic("Cannot find sync header")
+	}
+	return b[index:]
+}
+
+// PartitionMp3Frames takes an entire
+// mp3 file andreturns a slice of frames
+func PartitionMp3Frames(b []byte) [][]byte {
+	syncStart, err := hex.DecodeString("FFE")
+	if err != nil {
+		panic(err)
+	}
+	if !bytes.HasPrefix(b, syncStart) {
+		panic("Invalid Input: b does not start with sync header")
+	}
+	var frames [][]byte = bytes.SplitN(b, syncStart, -1)
+	return frames
 }
