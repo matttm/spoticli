@@ -34,7 +34,7 @@ func ReadID3v2Header(b []byte) []byte {
 	if !bytes.Equal(identifier, []byte(idString)) {
 		panic("No ID3 indicator found")
 	}
-	syncStart, err := hex.DecodeString("FFE")
+	syncStart, err := hex.DecodeString("0FFE")
 	if err != nil {
 		panic(err)
 	}
@@ -48,13 +48,26 @@ func ReadID3v2Header(b []byte) []byte {
 // PartitionMp3Frames takes an entire
 // mp3 file andreturns a slice of frames
 func PartitionMp3Frames(b []byte) [][]byte {
-	syncStart, err := hex.DecodeString("FFE")
+	syncStart, err := hex.DecodeString("0FFE")
 	if err != nil {
 		panic(err)
 	}
 	if !bytes.HasPrefix(b, syncStart) {
 		panic("Invalid Input: b does not start with sync header")
 	}
-	var frames [][]byte = bytes.SplitN(b, syncStart, -1)
+	var frames [][]byte
+	syncLen := len(syncStart)
+	startIndex := 0
+	endIndex := bytes.Index(b[syncLen:], syncStart) // as asserted by above, this is a sync, so we'll add the length of sync togo to  header of following frame
+	for endIndex != -1 {
+		segment := b[startIndex:endIndex]
+		frames = append(frames, bytes.Clone(segment))
+		startIndex = endIndex
+		b = b[startIndex:]
+		endIndex = bytes.Index(b[syncLen:], syncStart) // as asserted by above, this is 0
+	}
+	// append the last frame e (idx algorithm couldnt find end boundary
+	segment := b
+	frames = append(frames, bytes.Clone(segment))
 	return frames
 }

@@ -40,7 +40,9 @@ func GetAudio(id int) ([]byte, *int64, error) {
 	// the following  blobk is in testing TODO:
 	body = ReadID3v2Header(body)
 	frames := PartitionMp3Frames(body)
-	fmt.Printf("after partition: %v\n", frames)
+	for i := range frames {
+		fmt.Println(frames[i][:12])
+	}
 	// end test NOTE:
 	return body, res.ContentLength, nil
 }
