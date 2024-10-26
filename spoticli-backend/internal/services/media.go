@@ -3,6 +3,7 @@ package services
 import (
 	"bytes"
 	"encoding/hex"
+	"slices"
 
 	models "github.com/matttm/spoticli/spoticli-models"
 )
@@ -69,5 +70,6 @@ func PartitionMp3Frames(b []byte) [][]byte {
 		startIndex = NextFrameStart(b)
 		endIndex = len(b)
 	}
+	slices.Reverse(frames)
 	return frames
 }

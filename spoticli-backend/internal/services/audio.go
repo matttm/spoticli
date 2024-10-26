@@ -37,13 +37,6 @@ func GetAudio(id int) ([]byte, *int64, error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	// the following  blobk is in testing TODO:
-	body = ReadID3v2Header(body)
-	frames := PartitionMp3Frames(body)
-	for i := range frames {
-		fmt.Println(frames[i][:12])
-	}
-	// end test NOTE:
 	return body, res.ContentLength, nil
 }
 
@@ -68,7 +61,9 @@ func getAudioPart(id int, _range string) ([]byte, *int64, error) {
 	fmt.Printf("Content-Range from AWS %s\n", *res.ContentRange)
 	return body, res.ContentLength, nil
 }
-func StreamAudioSegment(id int, start, end *int) ([]byte, *int64, *int, error) {
+
+// StreamAudioSegment
+func StreamAudioSegment(id int, start, end *int) ([]byte, *int, *int, error) {
 	t, _ := GetTrack(id)
 	filesize := t.FileSize
 	// key := t.Title
@@ -80,12 +75,32 @@ func StreamAudioSegment(id int, start, end *int) ([]byte, *int64, *int, error) {
 	if *start >= *end || *end > filesize+1 {
 		return nil, nil, nil, errors.New("Invalid range header")
 	}
-	body, length, err := getAudioPart(
-		id,
-		fmt.Sprintf("bytes=%d-%d", *start, *end),
-	)
+	key := t.Title
+	svc := GetStorageService()
+	// TODO: rewrite and use getaudiopart
+	res, err := svc.DownloadFile(key, nil)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	body, err := io.ReadAll(res.Body)
+	defer res.Body.Close()
 	if err != nil {
 		panic(err)
 	}
-	return body, length, &filesize, nil
+	// the following  blobk is in testing TODO:
+	body = ReadID3v2Header(body)
+	frames := PartitionMp3Frames(body)
+	fmt.Printf("Frame count: %d\n", len(frames))
+	// end test NOTE:
+	fr := flatten(frames[30:70])
+	length := len(fr)
+	return fr, &length, &filesize, nil
+}
+
+func flatten(arr [][]byte) []byte {
+	result := []byte{}
+	for _, subarr := range arr {
+		result = append(result, subarr...)
+	}
+	return result
 }
