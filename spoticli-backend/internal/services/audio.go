@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
+
+	"github.com/matttm/spoticli/spoticli-backend/internal/utilities"
 )
 
 // GetPresignedUrl gets a presigned url
@@ -92,15 +94,7 @@ func StreamAudioSegment(id int, start, end *int) ([]byte, *int, *int, error) {
 	frames := PartitionMp3Frames(body)
 	fmt.Printf("Frame count: %d\n", len(frames))
 	// end test NOTE:
-	fr := flatten(frames[30:70])
+	fr := utilities.Flatten(frames[30:70])
 	length := len(fr)
 	return fr, &length, &filesize, nil
-}
-
-func flatten(arr [][]byte) []byte {
-	result := []byte{}
-	for _, subarr := range arr {
-		result = append(result, subarr...)
-	}
-	return result
 }

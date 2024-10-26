@@ -1,6 +1,8 @@
 // Package services
 package services
 
+import "github.com/matttm/spoticli/spoticli-backend/internal/utilities"
+
 type CacheService struct {
 	Redis map[int][][]byte // map of id to song, which is cut in segments
 }
@@ -34,7 +36,7 @@ func cacheItem(id int, frames [][]byte) error {
 	var songSlices [][]byte
 	for cur < n {
 		end = min(cur+frameClusterSize, n)
-		b := flatten(frames[cur:end])
+		b := utilities.Flatten(frames[cur:end])
 		songSlices = append(songSlices, b)
 		cur += frameClusterSize
 	}
