@@ -22,7 +22,7 @@ func GetAudio(id int) ([]byte, *int64, error) {
 	key := t.Title
 	svc := GetStorageService()
 	// TODO: rewrite and use getaudiopart
-	body, err := svc.DownloadFile(key, nil, nil)
+	body, _, err := svc.DownloadFile(key, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -39,7 +39,7 @@ func getAudioPart(id int) ([]byte, *int64, error) {
 	key := t.Title
 	svc := GetStorageService()
 	// TODO: put file in redis
-	body, err := svc.DownloadFile(key, nil, nil)
+	body, _, err := svc.DownloadFile(key, nil, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -48,9 +48,9 @@ func getAudioPart(id int) ([]byte, *int64, error) {
 }
 
 // StreamAudioSegment
-func StreamAudioSegment(id int, start, end *int64) ([]byte, *int, *int, error) {
+func StreamAudioSegment(id int, start, end *int64) ([]byte, *int, *int64, error) {
 	t, _ := GetTrack(id)
-	filesize := t.FileSize
+	var filesize int64
 	// key := t.Title
 	if *start == 0 {
 		*end = GetConfigValue[int64]("STREAM_SEGMENT_SIZE")
@@ -63,7 +63,7 @@ func StreamAudioSegment(id int, start, end *int64) ([]byte, *int, *int, error) {
 	key := t.Title
 	svc := GetStorageService()
 	// TODO: rewrite and use getaudiopart
-	segment, err := svc.DownloadFile(key, start, end)
+	segment, filesize, err := svc.DownloadFile(key, start, end)
 	if err != nil {
 		return nil, nil, nil, err
 	}

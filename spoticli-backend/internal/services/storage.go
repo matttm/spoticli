@@ -51,7 +51,7 @@ func (s *StorageService) GetPresignedUrl(key string) (string, error) {
 }
 
 // DownloadFile invokes GetObject command with a range if provided
-func (s *StorageService) DownloadFile(key string, start, end *int64) ([]byte, error) {
+func (s *StorageService) DownloadFile(key string, start, end *int64) ([]byte, int64, error) {
 	requestedFrames := make(chan []byte, 1)
 	if !isItemCached(key) {
 		input := &s3.GetObjectInput{
@@ -68,16 +68,18 @@ func (s *StorageService) DownloadFile(key string, start, end *int64) ([]byte, er
 			panic(err)
 		}
 		// the following  blobk is in testing TODO: subtract id3 sz from filesz
+		originalSize := len(body)
 		body = ReadID3v2Header(body)
+		bytesFromFrames := originalSize - len(body)
 		frames := PartitionMp3Frames(body)
 		fmt.Printf("Frame count: %d\n", len(frames))
 		// end test NOTE:
 		// TODO : put in a goroutine
 		cacheItem(key, frames, *start, *end, requestedFrames)
-		return getSegmentFromCache(key, start, end), nil
+		return getSegmentFromCache(key, start, end), int64(bytesFromFrames), nil
 	} else {
-		return getSegmentFromCache(key, start, end), nil
+		return getSegmentFromCache(key, start, end), filesize(key), nil
 	}
-	x := <-requestedFrames
-	return x, nil
+	// x := <-requestedFrames
+	// return x, nil
 }

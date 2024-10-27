@@ -44,6 +44,15 @@ func getSegmentFromCache(key string, reqStart, reqEnd *int64) []byte {
 	panic("")
 	return nil
 }
+func filesize(key string) int64 {
+	// TODO: REIMPLEMENT WITH BIN-SEARCH
+	var sum int64 = 0
+	for _, v := range cacheService.Redis[key] {
+		c := int64(len(v))
+		sum += c
+	}
+	return sum
+}
 
 func cacheItem(key string, frames [][]byte, reqStart, reqEnd int64, reqFrames chan []byte) error {
 	if isItemCached(key) {
