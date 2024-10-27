@@ -35,6 +35,7 @@ func getSegmentFromCache(key string, reqStart int64) []byte {
 		fmt.Printf("start %d -- sum %d\n", reqStart, sum)
 		sum += int64(len(v))
 		if reqStart <= sum {
+			fmt.Printf("Sending frame %d\n", i)
 			return v
 		}
 	}
