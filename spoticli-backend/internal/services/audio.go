@@ -34,7 +34,7 @@ func GetAudio(id int) ([]byte, *int64, error) {
 // invokes the downloading and turning the reader into bytexs
 //
 // _range input, must be in the form "bytes=<start>-<end>"
-func getAudioPart(id int, _range string) ([]byte, *int64, error) {
+func getAudioPart(id int) ([]byte, *int64, error) {
 	t, _ := GetTrack(id)
 	key := t.Title
 	svc := GetStorageService()

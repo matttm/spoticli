@@ -72,10 +72,12 @@ func (s *StorageService) DownloadFile(key string, start, end *int64) ([]byte, er
 		frames := PartitionMp3Frames(body)
 		fmt.Printf("Frame count: %d\n", len(frames))
 		// end test NOTE:
-		go cacheItem(key, frames, *start, *end, requestedFrames)
+		// TODO : put in a goroutine
+		cacheItem(key, frames, *start, *end, requestedFrames)
+		return getSegmentFromCache(key, *start), nil
 	} else {
 		return getSegmentFromCache(key, *start), nil
 	}
-
-	return <-requestedFrames, nil
+	x := <-requestedFrames
+	return x, nil
 }

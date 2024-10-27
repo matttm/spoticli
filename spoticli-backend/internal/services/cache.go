@@ -1,7 +1,11 @@
 // Package services
 package services
 
-import "github.com/matttm/spoticli/spoticli-backend/internal/utilities"
+import (
+	"fmt"
+
+	"github.com/matttm/spoticli/spoticli-backend/internal/utilities"
+)
 
 type CacheService struct {
 	Redis map[string][][]byte // map of id to song, which is cut in segments
@@ -22,15 +26,16 @@ func isItemCached(key string) bool {
 	return ok
 }
 
-func getSegmentFromCache(key string, segment int64) []byte {
+func getSegmentFromCache(key string, reqStart int64) []byte {
 	// TODO: REIMPLEMENT WITH BIN-SEARCH
-	sum := 0
+	var sum int64 = 0
 	for _, v := range getCacheService().Redis[key] {
-		sum += len(v)
-		if int(segment) > sum {
+		sum += int64(len(v))
+		if reqStart > sum {
 			return v
 		}
 	}
+	panic("Unable to get cache store for key")
 	return nil
 }
 
@@ -38,20 +43,25 @@ func cacheItem(key string, frames [][]byte, reqStart, reqEnd int64, reqFrames ch
 	if isItemCached(key) {
 		panic("Item is already cached")
 	}
-	frameClusterSize := int64(GetConfigValue[int]("FRAME_CLUSTER_SIZE"))
-	var cur int64 = 0
-	var end int64 = 0
+	frameClusterSize := GetConfigValue[int64]("FRAME_CLUSTER_SIZE")
+	var startFrame int64 = 0
+	var endFrame int64 = 0
+	var curByte int64 = 0
 	n := int64(len(frames))
 	var songSegments [][]byte
-	for cur < n {
-		end = min(cur+frameClusterSize, n)
-		b := utilities.Flatten(frames[cur:end])
+	for startFrame < n {
+		endFrame = min(startFrame+frameClusterSize, n)
+		b := utilities.Flatten(frames[startFrame:endFrame])
 		songSegments = append(songSegments, b)
-		cur += frameClusterSize
-		if cur >= reqEnd {
-			reqFrames <- getSegmentFromCache(key, reqStart)
+		startFrame += frameClusterSize
+		curByte += int64(len(b))
+		if curByte >= reqEnd {
 		}
 	}
+	// TODO: optimize reqFrames later
+	// reqFrames <- getSegmentFromCache(key, reqStart)
 	getCacheService().Redis[key] = songSegments
+	fmt.Printf("merged frame count: %d\n", len(cacheService.Redis[key]))
+	fmt.Printf("merged frame-0 size: %d\n", len(cacheService.Redis[key][0]))
 	return nil
 }
