@@ -1,0 +1,188 @@
+{
+	"info": {
+		"_postman_id": "b11f44bd-8637-4632-9ac1-3ccb3b626ca7",
+		"name": "spoticli-backend",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "12120524"
+	},
+	"item": [
+		{
+			"name": "audio",
+			"item": [
+				{
+					"name": "download via proxy",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{address}}/audio/proxy/{{song-id}}",
+							"host": [
+								"{{address}}"
+							],
+							"path": [
+								"audio",
+								"proxy",
+								"{{song-id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "stream via proxy without a range",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('play slice', function () {",
+									"",
+									"    var audioData = pm.response.body; // Assuming the MP3 data is in the response body",
+									"",
+									"    var Audio = pm.require('Audio')",
+									"    // Create an audio element",
+									"    var audio = new Audio();",
+									"",
+									"    // Set the audio source and playback range (adjust as needed)",
+									"    audio.src = 'data:audio/mpeg;base64,' + audioData;",
+									"    audio.currentTime = 10; // Start at 10 seconds",
+									"    audio.duration = 20; // Play for 20 seconds",
+									"",
+									"    // Play the audio",
+									"    audio.play();",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Range",
+								"value": "bytes=0-0",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{address}}/audio/proxy/stream/{{song-id}}",
+							"host": [
+								"{{address}}"
+							],
+							"path": [
+								"audio",
+								"proxy",
+								"stream",
+								"{{song-id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get presigned url",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{address}}/audio/{{song-id}}",
+							"host": [
+								"{{address}}"
+							],
+							"path": [
+								"audio",
+								"{{song-id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "stream via proxy with a range",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('play slice', function () {",
+									"",
+									"    var audioData = pm.response.body; // Assuming the MP3 data is in the response body",
+									"",
+									"    var Audio = pm.require('Audio')",
+									"    // Create an audio element",
+									"    var audio = new Audio();",
+									"",
+									"    // Set the audio source and playback range (adjust as needed)",
+									"    audio.src = 'data:audio/mpeg;base64,' + audioData;",
+									"    audio.currentTime = 10; // Start at 10 seconds",
+									"    audio.duration = 20; // Play for 20 seconds",
+									"",
+									"    // Play the audio",
+									"    audio.play();",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Range",
+								"value": "bytes=4000000-3000000",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{address}}/audio/proxy/stream/{{song-id}}",
+							"host": [
+								"{{address}}"
+							],
+							"path": [
+								"audio",
+								"proxy",
+								"stream",
+								"{{song-id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "healthcheck",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{address}}/",
+					"host": [
+						"{{address}}"
+					],
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "presigned-url",
+			"value": "test",
+			"type": "default"
+		},
+		{
+			"key": "song-id",
+			"value": "1337",
+			"type": "default"
+		}
+	]
+}

@@ -1,7 +1,6 @@
 package utilities
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"net/http"
@@ -80,8 +79,8 @@ func GetBytesBackend(headerCb func(*http.Request), seg *models.AudioSegment, arg
 // seg an AudioSegment that will be updated with the response'
 // "Content-Range" header, nost useful for partial data
 
-func GetBufferedAudioSegment(header []byte, id string, seg *models.AudioSegment) ([]byte, beep.StreamSeekCloser, beep.Format) {
-	data, _ := GetBytesBackend(
+func GetBufferedAudioSegment(id string, seg *models.AudioSegment) (beep.StreamSeekCloser, beep.Format) {
+	dataStream := GetBytesOpenReader(
 		func(r *http.Request) {
 			// TODO: REMOVE HEADER ON FIRST SEND
 			if seg.StartByte != 0 {
@@ -94,22 +93,11 @@ func GetBufferedAudioSegment(header []byte, id string, seg *models.AudioSegment)
 		seg,
 		fmt.Sprintf("audio/proxy/stream/%s", id),
 	)
-	if len(header) != 0 {
-		var copyHeader [128]byte
-		for i := range header {
-			copyHeader[i] = header[i]
-		}
-		data = append(copyHeader[:], data...)
-	} else {
-		header = data[:128] // rip off mp3 header + ID3v1 heder
-	}
-	reader := bytes.NewReader(data)
-	dataStream := io.NopCloser(reader)
 	streamer, format, err := mp3.Decode(dataStream)
 	if err != nil {
 		panic(err)
 	}
-	return header, streamer, format
+	return streamer, format
 }
 
 func getClient() *http.Client {
