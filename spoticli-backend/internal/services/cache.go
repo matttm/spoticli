@@ -26,15 +26,19 @@ func isItemCached(key string) bool {
 	return ok
 }
 
-func getSegmentFromCache(key string, reqStart int64) []byte {
+func getSegmentFromCache(key string, reqStart, reqEnd *int64) []byte {
 	// TODO: REIMPLEMENT WITH BIN-SEARCH
 	fmt.Printf("merged frame count from in getter: %d\n", len(cacheService.Redis[key]))
 	var sum int64 = 0
 	for i, v := range cacheService.Redis[key] {
 		fmt.Printf("merged frame i size: %d\n", len(cacheService.Redis[key][i]))
-		fmt.Printf("start %d -- sum %d\n", reqStart, sum)
-		sum += int64(len(v))
-		if reqStart <= sum {
+		fmt.Printf("start %d -- sum %d\n", *reqStart, sum)
+		c := int64(len(v))
+		sum += c
+		if *reqStart <= sum {
+			// TODO: DOCUMENT SIDE EFFECT
+			*reqStart = sum - c
+			*reqEnd = sum
 			fmt.Printf("Sending frame %d\n", i)
 			return v
 		}
@@ -65,7 +69,5 @@ func cacheItem(key string, frames [][]byte, reqStart, reqEnd int64, reqFrames ch
 	// TODO: optimize reqFrames later
 	// reqFrames <- getSegmentFromCache(key, reqStart)
 	getCacheService().Redis[key] = songSegments
-	fmt.Printf("merged frame count: %d\n", len(cacheService.Redis[key]))
-	fmt.Printf("merged frame-0 size: %d\n", len(cacheService.Redis[key][0]))
 	return nil
 }

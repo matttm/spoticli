@@ -74,9 +74,9 @@ func (s *StorageService) DownloadFile(key string, start, end *int64) ([]byte, er
 		// end test NOTE:
 		// TODO : put in a goroutine
 		cacheItem(key, frames, *start, *end, requestedFrames)
-		return getSegmentFromCache(key, *start), nil
+		return getSegmentFromCache(key, start, end), nil
 	} else {
-		return getSegmentFromCache(key, *start), nil
+		return getSegmentFromCache(key, start, end), nil
 	}
 	x := <-requestedFrames
 	return x, nil
