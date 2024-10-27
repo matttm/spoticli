@@ -51,7 +51,27 @@ func (s *StorageService) GetPresignedUrl(key string) (string, error) {
 }
 
 // DownloadFile invokes GetObject command with a range if provided
-func (s *StorageService) DownloadFile(key string, start, end *int64) ([]byte, int64, error) {
+func (s *StorageService) DownloadFile(key string, _range *string) ([]byte, error) {
+	input := &s3.GetObjectInput{
+		Bucket: TRACKS_BUCKET_NAME,
+		Key:    aws.String(key),
+	}
+	if _range != nil {
+		input.Range = aws.String(*_range)
+	}
+	res, err := s.client.GetObject(
+		context.TODO(),
+		input,
+	)
+	defer res.Body.Close()
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		panic(err)
+	}
+	return body, nil
+}
+
+func (s *StorageService) StreamFile(key string, start, end *int64) ([]byte, int64, error) {
 	requestedFrames := make(chan []byte, 1)
 	if !isItemCached(key) {
 		input := &s3.GetObjectInput{

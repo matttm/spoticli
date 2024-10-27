@@ -22,26 +22,9 @@ func GetAudio(id int) ([]byte, *int64, error) {
 	key := t.Title
 	svc := GetStorageService()
 	// TODO: rewrite and use getaudiopart
-	body, _, err := svc.DownloadFile(key, nil, nil)
+	body, err := svc.DownloadFile(key, nil)
 	if err != nil {
 		return nil, nil, err
-	}
-	length := int64(len(body))
-	return body, &length, nil
-}
-
-// getAudioPart is a helper function in services which
-// invokes the downloading and turning the reader into bytexs
-//
-// _range input, must be in the form "bytes=<start>-<end>"
-func getAudioPart(id int) ([]byte, *int64, error) {
-	t, _ := GetTrack(id)
-	key := t.Title
-	svc := GetStorageService()
-	// TODO: put file in redis
-	body, _, err := svc.DownloadFile(key, nil, nil)
-	if err != nil {
-		panic(err)
 	}
 	length := int64(len(body))
 	return body, &length, nil
@@ -63,7 +46,7 @@ func StreamAudioSegment(id int, start, end *int64) ([]byte, *int, *int64, error)
 	key := t.Title
 	svc := GetStorageService()
 	// TODO: rewrite and use getaudiopart
-	segment, filesize, err := svc.DownloadFile(key, start, end)
+	segment, filesize, err := svc.StreamFile(key, start, end)
 	if err != nil {
 		return nil, nil, nil, err
 	}
