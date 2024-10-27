@@ -83,7 +83,7 @@ func GetAudioPart(w http.ResponseWriter, r *http.Request) {
 			"bytes %d-%d/%d",
 			start,
 			end,
-			length,
+			*fileSize,
 		),
 	)
 	w.WriteHeader(http.StatusPartialContent)

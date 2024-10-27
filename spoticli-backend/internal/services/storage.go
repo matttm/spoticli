@@ -67,7 +67,7 @@ func (s *StorageService) DownloadFile(key string, start, end *int64) ([]byte, er
 		if err != nil {
 			panic(err)
 		}
-		// the following  blobk is in testing TODO:
+		// the following  blobk is in testing TODO: subtract id3 sz from filesz
 		body = ReadID3v2Header(body)
 		frames := PartitionMp3Frames(body)
 		fmt.Printf("Frame count: %d\n", len(frames))

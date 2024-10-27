@@ -56,6 +56,7 @@ func StreamAudioSegment(id int, start, end *int64) ([]byte, *int, *int, error) {
 		*end = GetConfigValue[int64]("STREAM_SEGMENT_SIZE")
 	}
 	if *start >= int64(t.FileSize) {
+		panic("Invalid start pos")
 		var b []byte
 		return b, nil, nil, nil
 	}

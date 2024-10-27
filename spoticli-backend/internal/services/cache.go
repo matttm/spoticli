@@ -40,7 +40,8 @@ func getSegmentFromCache(key string, reqStart, reqEnd *int64) []byte {
 			return v
 		}
 	}
-	panic("Unable to get cache store for key")
+	fmt.Printf("Unable to get cache store for key %s with start %d of %d b", key, *reqStart, sum)
+	panic("")
 	return nil
 }
 
