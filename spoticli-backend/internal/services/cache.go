@@ -28,10 +28,13 @@ func isItemCached(key string) bool {
 
 func getSegmentFromCache(key string, reqStart int64) []byte {
 	// TODO: REIMPLEMENT WITH BIN-SEARCH
+	fmt.Printf("merged frame count from in getter: %d\n", len(cacheService.Redis[key]))
 	var sum int64 = 0
-	for _, v := range getCacheService().Redis[key] {
+	for i, v := range cacheService.Redis[key] {
+		fmt.Printf("merged frame i size: %d\n", len(cacheService.Redis[key][i]))
+		fmt.Printf("start %d -- sum %d\n", reqStart, sum)
 		sum += int64(len(v))
-		if reqStart > sum {
+		if reqStart <= sum {
 			return v
 		}
 	}
