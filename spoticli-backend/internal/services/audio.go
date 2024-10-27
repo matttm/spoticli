@@ -55,6 +55,10 @@ func StreamAudioSegment(id int, start, end *int64) ([]byte, *int, *int, error) {
 	if *start == 0 {
 		*end = GetConfigValue[int64]("STREAM_SEGMENT_SIZE")
 	}
+	if *start >= int64(t.FileSize) {
+		var b []byte
+		return b, nil, nil, nil
+	}
 	key := t.Title
 	svc := GetStorageService()
 	// TODO: rewrite and use getaudiopart

@@ -43,7 +43,7 @@ func GetBytesOpenReader(headerCb func(*http.Request), seg *models.AudioSegment, 
 	}
 	// TODO: REFACTOR AND VALIDATE
 	contentRange := res.Header["Content-Range"][0]
-	_, err = fmt.Sscanf(contentRange, "bytes %d-%d/%d", &seg.StartByte, &seg.EndByte, &seg.TotalBytes)
+	_, err = fmt.Sscanf(contentRange, "bytes %d-%d/%d", &seg.StartByte, &seg.EndByte, &seg.SegmentLength)
 	if err != nil {
 		panic(err)
 	}

@@ -23,7 +23,7 @@ func GetMusiceService() *MediaService {
 func GetTrack(id int) (*models.Track, error) {
 	t := new(models.Track)
 	t.Title = "bat_country.mp3"
-	t.FileSize = 7523726
+	t.FileSize = 7504586
 	return t, nil
 }
 
