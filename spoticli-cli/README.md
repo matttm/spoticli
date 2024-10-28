@@ -1,0 +1,3 @@
+# spoticli-cli
+
+## Getting started
