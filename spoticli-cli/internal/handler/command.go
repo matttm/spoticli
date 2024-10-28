@@ -7,12 +7,13 @@ import (
 
 	"github.com/gopxl/beep/v2"
 	"github.com/gopxl/beep/v2/speaker"
+	"github.com/matttm/spoticli/spoticli-cli/internal/config"
 	"github.com/matttm/spoticli/spoticli-cli/internal/models"
 	"github.com/matttm/spoticli/spoticli-cli/internal/utilities"
 )
 
 func DownloadSong(id string) error {
-	seg := models.AudioSegment{StartByte: 0, EndByte: 0, TotalBytes: 0}
+	seg := models.AudioSegment{StartByte: 0, EndByte: 0, SegmentLength: 0}
 	b, _ := utilities.GetBytesBackend(
 		nil,
 		&seg,
@@ -35,31 +36,31 @@ func StreamSong(id string) error {
 	speaker.Play(&queue)
 
 	// creating struct to follow boundaries
-	seg := models.AudioSegment{StartByte: 0, EndByte: -1, TotalBytes: 0}
+	seg := models.AudioSegment{StartByte: 0, EndByte: -1, SegmentLength: 0}
 	var streamer beep.StreamSeekCloser
-	var header []byte = []byte{} //TODO: research tcolgate/mp3 as an alternative to gopxl/beep
 	// then perform loop for remainder of song
-	ticker := time.NewTicker(time.Second * 15)
+	ticker := time.NewTicker(time.Second * config.SECONDS_TO_WAIT_PER_FRAMES)
 	go func() {
 		for ; ; <-ticker.C {
-			header, streamer, _ = utilities.GetBufferedAudioSegment(header, id, &seg) // this function call has a side affect on seg
+			streamer, _ = utilities.GetBufferedAudioSegment(id, &seg) // this function call has a side affect on seg
 
 			// The speaker's sample rate is fixed at 44100. Therefore, we need to
 			// resample the file in case it's in a different sample rate.
 			// resampled := beep.Resample(4, format.SampleRate, sr, streamer)
-			fmt.Printf("start %d -- end %d -- total %d\n", seg.StartByte, seg.EndByte, seg.TotalBytes)
+			fmt.Printf("start %d -- end %d -- total %d\n", seg.StartByte, seg.EndByte, seg.SegmentLength)
 
 			// And finally, we add the song to the queue.
 			speaker.Lock()
 			queue.Add(streamer)
 			speaker.Unlock()
-			if seg.EndByte == seg.TotalBytes {
+			if seg.EndByte == seg.SegmentLength {
+				fmt.Println("Finished streaming song")
 				return
 			}
 			// make seg point to next desired segment
 			delta := seg.EndByte - seg.StartByte
-			seg.StartByte = seg.EndByte
-			seg.EndByte = min(seg.StartByte+delta, seg.TotalBytes+1)
+			seg.StartByte = seg.EndByte + 1
+			seg.EndByte = min(seg.StartByte+delta, seg.SegmentLength+1)
 
 		}
 	}()

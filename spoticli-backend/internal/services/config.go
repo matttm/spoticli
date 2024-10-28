@@ -36,7 +36,10 @@ func GetConfigService() *ConfigService {
 			}
 			configService.CloudConfig = cfg
 			configService.Config = map[string]interface{}{}
-			configService.Config["STREAM_SEGMENT_SIZE"], _ = strconv.Atoi(os.Getenv("STREAM_SEGMENT_SIZE"))
+			segSz, _ := strconv.Atoi(os.Getenv("STREAM_SEGMENT_SIZE"))
+			configService.Config["STREAM_SEGMENT_SIZE"] = int64(segSz)
+			frmSz, _ := strconv.Atoi(os.Getenv("FRAME_CLUSTER_SIZE"))
+			configService.Config["FRAME_CLUSTER_SIZE"] = int64(frmSz)
 			println("ConfigService Instantiated")
 		}
 	}

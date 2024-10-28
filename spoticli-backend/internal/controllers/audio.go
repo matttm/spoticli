@@ -57,7 +57,7 @@ func GetAudioPart(w http.ResponseWriter, r *http.Request) {
 		mux.Vars(r)["id"],
 	)
 	// NOTE: if there's no header, must be trying to get first bytes
-	var start, end int
+	var start, end int64
 	if len(r.Header["Range"]) == 0 {
 		start = 0
 		end = 0
@@ -76,14 +76,14 @@ func GetAudioPart(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("ContentLength %d\n", *length)
 	fmt.Printf("FileSize %d\n", *fileSize)
 	w.Header().Add("Content-Type", "audio/mp3")
-	w.Header().Add("Content-Length", strconv.FormatInt(*length, 10))
+	w.Header().Add("Content-Length", fmt.Sprintf("%d", *length))
 	w.Header().Set(
 		"Content-Range",
 		fmt.Sprintf(
 			"bytes %d-%d/%d",
 			start,
 			end,
-			length,
+			*fileSize,
 		),
 	)
 	w.WriteHeader(http.StatusPartialContent)
