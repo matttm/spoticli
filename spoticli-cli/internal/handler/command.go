@@ -26,12 +26,12 @@ func DownloadSong(id string) error {
 	return nil
 }
 func StreamSong(id string) error {
-	id = "1"
 	fmt.Println(id)
 	sr := beep.SampleRate(44100)
 	speaker.Init(sr, sr.N(time.Second/10))
 
 	// A zero Queue is an empty Queue.
+	done := make(chan bool, 2)
 	var queue models.AudioSegmentQueue
 	speaker.Play(&queue)
 
@@ -43,11 +43,10 @@ func StreamSong(id string) error {
 	go func() {
 		for ; ; <-ticker.C {
 			streamer, _ = utilities.GetBufferedAudioSegment(id, &seg) // this function call has a side affect on seg
+			// start channel done
+			done <- true
 
-			// The speaker's sample rate is fixed at 44100. Therefore, we need to
-			// resample the file in case it's in a different sample rate.
-			// resampled := beep.Resample(4, format.SampleRate, sr, streamer)
-			fmt.Printf("start %d -- end %d -- total %d\n", seg.StartByte, seg.EndByte, seg.SegmentLength)
+			fmt.Printf("Content-Range: %d-%d, %d\n", seg.StartByte, seg.EndByte, seg.SegmentLength)
 
 			// And finally, we add the song to the queue.
 			speaker.Lock()
@@ -55,6 +54,8 @@ func StreamSong(id string) error {
 			speaker.Unlock()
 			if seg.EndByte == seg.SegmentLength {
 				fmt.Println("Finished streaming song")
+				// end channel
+				done <- true
 				return
 			}
 			// make seg point to next desired segment
@@ -65,7 +66,6 @@ func StreamSong(id string) error {
 		}
 	}()
 
-	select {}
-	ticker.Stop()
+	<-done
 	return nil
 }
