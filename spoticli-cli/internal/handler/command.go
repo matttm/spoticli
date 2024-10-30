@@ -31,7 +31,8 @@ func StreamSong(id string) error {
 	speaker.Init(sr, sr.N(time.Second/10))
 
 	// A zero Queue is an empty Queue.
-	done := make(chan bool, 2)
+	done := make(chan bool)
+	start := make(chan bool)
 	var queue models.AudioSegmentQueue
 	speaker.Play(&queue)
 
@@ -44,28 +45,37 @@ func StreamSong(id string) error {
 		for ; ; <-ticker.C {
 			streamer, _ = utilities.GetBufferedAudioSegment(id, &seg) // this function call has a side affect on seg
 			// start channel done
-			done <- true
-
 			fmt.Printf("Content-Range: %d-%d, %d\n", seg.StartByte, seg.EndByte, seg.SegmentLength)
 
 			// And finally, we add the song to the queue.
 			speaker.Lock()
 			queue.Add(streamer)
 			speaker.Unlock()
+			if seg.StartByte == 0 {
+				start <- true
+				close(start)
+			}
+
 			if seg.EndByte == seg.SegmentLength {
 				fmt.Println("Finished streaming song")
 				// end channel
-				done <- true
-				return
+				if _, ok := <-start; !ok {
+					queue.Add(beep.Callback(func() {
+						done <- true
+						close(done)
+					}))
+					return
+				}
 			}
 			// make seg point to next desired segment
 			delta := seg.EndByte - seg.StartByte
 			seg.StartByte = seg.EndByte + 1
 			seg.EndByte = min(seg.StartByte+delta, seg.SegmentLength+1)
-
 		}
 	}()
-
-	<-done
+	_ = <-start
+	fmt.Println("Song starts now")
+	_ = <-done
+	fmt.Println("Song finished playing")
 	return nil
 }
