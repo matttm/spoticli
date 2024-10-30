@@ -47,3 +47,4 @@ Once these are in your enironment, you can run the backend in the terminal as fo
 $ go build
 $ ./spoticli-backend
 ```
+## Architecture
