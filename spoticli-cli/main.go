@@ -50,17 +50,19 @@ func main() {
 					},
 					{
 						Name:  "play",
-						Usage: "play <song-title>",
+						Usage: "play <song-id",
 						Action: func(cCtx *cli.Context) error {
-							handler.StreamSong("1")
+							id := cCtx.Args().Get(0)
+							handler.StreamSong(id)
 							return nil
 						},
 					},
 					{
 						Name:  "download",
-						Usage: "download <song-title>",
+						Usage: "download <song-id>",
 						Action: func(cCtx *cli.Context) error {
-							handler.DownloadSong("1")
+							id := cCtx.Args().Get(0)
+							handler.DownloadSong(id)
 							return nil
 						},
 					},
