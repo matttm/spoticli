@@ -11,7 +11,7 @@ import (
 	"github.com/matttm/spoticli/spoticli-backend/internal/services"
 )
 
-var AudioService = &services.AudioServiceWrap{}
+var audioService services.ApiAudioService = &services.AudioServiceWrap{}
 
 // GetPresignedUrl gets a presigned url for an object in s3
 // to be downloaded.
@@ -20,7 +20,7 @@ func GetPresignedUrl(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(
 		mux.Vars(r)["id"],
 	)
-	url, err := AudioService.GetPresignedUrl(id)
+	url, err := audioService.GetPresignedUrl(id)
 	if err != nil {
 		panic(err)
 	}
@@ -33,7 +33,7 @@ func GetAudio(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(
 		mux.Vars(r)["id"],
 	)
-	body, length, err := AudioService.GetAudio(id)
+	body, length, err := audioService.GetAudio(id)
 	if err != nil {
 		panic(err)
 	}
@@ -71,7 +71,7 @@ func GetAudioPart(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	// TODO: ensure end not gt file size
-	body, length, fileSize, err := AudioService.StreamAudioSegment(id, &start, &end)
+	body, length, fileSize, err := audioService.StreamAudioSegment(id, &start, &end)
 	if err != nil {
 		panic(err)
 	}
