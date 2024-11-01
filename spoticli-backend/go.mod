@@ -29,6 +29,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.28.0 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.32.0 // indirect
 	github.com/aws/smithy-go v1.22.0 // indirect
+	go.uber.org/mock v0.5.0 // indirect
 )
 
 replace github.com/matttm/spoticli/spoticli-models => ../spoticli-models
