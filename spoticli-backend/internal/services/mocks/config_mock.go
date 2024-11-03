@@ -12,7 +12,6 @@ package mock_services
 import (
 	reflect "reflect"
 
-	services "github.com/matttm/spoticli/spoticli-backend/internal/services"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -40,30 +39,30 @@ func (m *MockConfigServiceApi) EXPECT() *MockConfigServiceApiMockRecorder {
 	return m.recorder
 }
 
-// GetConfigService mocks base method.
-func (m *MockConfigServiceApi) GetConfigService() *services.ConfigService {
+// GetConfigValueInt64 mocks base method.
+func (m *MockConfigServiceApi) GetConfigValueInt64(k string) int64 {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetConfigService")
-	ret0, _ := ret[0].(*services.ConfigService)
+	ret := m.ctrl.Call(m, "GetConfigValueInt64", k)
+	ret0, _ := ret[0].(int64)
 	return ret0
 }
 
-// GetConfigService indicates an expected call of GetConfigService.
-func (mr *MockConfigServiceApiMockRecorder) GetConfigService() *gomock.Call {
+// GetConfigValueInt64 indicates an expected call of GetConfigValueInt64.
+func (mr *MockConfigServiceApiMockRecorder) GetConfigValueInt64(k any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetConfigService", reflect.TypeOf((*MockConfigServiceApi)(nil).GetConfigService))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetConfigValueInt64", reflect.TypeOf((*MockConfigServiceApi)(nil).GetConfigValueInt64), k)
 }
 
-// GetConfigValue mocks base method.
-func (m *MockConfigServiceApi) GetConfigValue(k string) any {
+// GetConfigValueString mocks base method.
+func (m *MockConfigServiceApi) GetConfigValueString(k string) string {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetConfigValue", k)
-	ret0, _ := ret[0].(any)
+	ret := m.ctrl.Call(m, "GetConfigValueString", k)
+	ret0, _ := ret[0].(string)
 	return ret0
 }
 
-// GetConfigValue indicates an expected call of GetConfigValue.
-func (mr *MockConfigServiceApiMockRecorder) GetConfigValue(k any) *gomock.Call {
+// GetConfigValueString indicates an expected call of GetConfigValueString.
+func (mr *MockConfigServiceApiMockRecorder) GetConfigValueString(k any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetConfigValue", reflect.TypeOf((*MockConfigServiceApi)(nil).GetConfigValue), k)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetConfigValueString", reflect.TypeOf((*MockConfigServiceApi)(nil).GetConfigValueString), k)
 }

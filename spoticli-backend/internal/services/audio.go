@@ -36,7 +36,7 @@ func StreamAudioSegment(id int, start, end *int64) ([]byte, *int, *int64, error)
 	var filesize int64
 	// key := t.Title
 	if *start == 0 {
-		*end = GetConfigValue[int64]("STREAM_SEGMENT_SIZE")
+		*end = GetConfigService().GetConfigValueInt64("STREAM_SEGMENT_SIZE")
 	}
 	if *start >= int64(t.FileSize) {
 		panic("Invalid start pos")
