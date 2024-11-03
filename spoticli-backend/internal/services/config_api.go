@@ -6,6 +6,6 @@ import ()
 //
 // needed for services and environment vars
 type ConfigServiceApi interface {
-	GetConfigService() *ConfigService
-	GetConfigValue(k string) any
+	GetConfigValueInt64(k string) int64
+	GetConfigValueString(k string) string
 }

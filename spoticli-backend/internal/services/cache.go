@@ -8,7 +8,8 @@ import (
 )
 
 type CacheService struct {
-	Redis map[string][][]byte // map of id to song, which is cut in segments
+	Redis         map[string][][]byte // map of id to song, which is cut in segments
+	configService ConfigServiceApi
 }
 
 var cacheService *CacheService
@@ -17,6 +18,7 @@ func getCacheService() *CacheService {
 	if cacheService == nil {
 		cacheService = &CacheService{}
 		cacheService.Redis = make(map[string][][]byte)
+		cacheService.configService = GetConfigService()
 	}
 	return cacheService
 }
@@ -58,7 +60,8 @@ func cacheItem(key string, frames [][]byte, reqStart, reqEnd int64, reqFrames ch
 	if isItemCached(key) {
 		panic("Item is already cached")
 	}
-	frameClusterSize := GetConfigValue[int64]("FRAME_CLUSTER_SIZE")
+	cs := getCacheService()
+	frameClusterSize := cs.configService.GetConfigValueInt64("FRAME_CLUSTER_SIZE")
 	var startFrame int64 = 0
 	var endFrame int64 = 0
 	var curByte int64 = 0
@@ -75,6 +78,6 @@ func cacheItem(key string, frames [][]byte, reqStart, reqEnd int64, reqFrames ch
 	}
 	// TODO: optimize reqFrames later
 	// reqFrames <- getSegmentFromCache(key, reqStart)
-	getCacheService().Redis[key] = songSegments
+	cs.Redis[key] = songSegments
 	return nil
 }

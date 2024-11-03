@@ -17,14 +17,14 @@ import (
 // needed for services and environment vars
 type ConfigService struct {
 	CloudConfig aws.Config
-	Config      map[string]interface{}
+	Config      map[string]string
 }
 
 var configLock = &sync.Mutex{}
 
 var configService *ConfigService
 
-func GetConfigService() *ConfigService {
+func GetConfigService() ConfigServiceApi {
 	if configService == nil {
 		configLock.Lock()
 		defer configLock.Unlock()
@@ -35,11 +35,9 @@ func GetConfigService() *ConfigService {
 				panic(err)
 			}
 			configService.CloudConfig = cfg
-			configService.Config = map[string]interface{}{}
-			segSz, _ := strconv.Atoi(os.Getenv("STREAM_SEGMENT_SIZE"))
-			configService.Config["STREAM_SEGMENT_SIZE"] = int64(segSz)
-			frmSz, _ := strconv.Atoi(os.Getenv("FRAME_CLUSTER_SIZE"))
-			configService.Config["FRAME_CLUSTER_SIZE"] = int64(frmSz)
+			configService.Config = map[string]string{}
+			configService.Config["STREAM_SEGMENT_SIZE"] = os.Getenv("STREAM_SEGMENT_SIZE")
+			configService.Config["FRAME_CLUSTER_SIZE"] = os.Getenv("FRAME_CLUSTER_SIZE")
 			println("ConfigService Instantiated")
 		}
 	}
@@ -47,6 +45,11 @@ func GetConfigService() *ConfigService {
 }
 
 // GetConfigValue gets an config var
-func GetConfigValue[T any](k string) T {
-	return GetConfigService().Config[k].(T) // type assertion
+func (cs *ConfigService) GetConfigValueString(k string) string {
+	return cs.Config[k]
+}
+func (cs *ConfigService) GetConfigValueInt64(k string) int64 {
+	intString := cs.Config[k]
+	_int, _ := strconv.Atoi(intString)
+	return int64(_int)
 }
