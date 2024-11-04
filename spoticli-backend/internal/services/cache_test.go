@@ -50,6 +50,18 @@ func Test_CacheService_CacheItem_Success(t *testing.T) {
 
 			},
 		},
+		{
+			clusterSize: 3,
+			assertFn: func(t *testing.T, res [][]byte) {
+				assert.Equal(t, 5, len(res), "Expected %d frame clusters: got %d", 8, len(res))
+				assert.Equal(t, []byte("frame:oneframe:twoframe:three"), res[0], "Expected")
+				assert.Equal(t, []byte("frame:fourframe:fiveframe:six"), res[1], "Expected")
+				assert.Equal(t, []byte("frame:sevenframe:eightframe:nine"), res[2], "Expected")
+				assert.Equal(t, []byte("frame:Aframe:Bframe:C"), res[3], "Expected")
+				assert.Equal(t, []byte("frame:Dframe:Eframe:F"), res[4], "Expected")
+
+			},
+		},
 	}
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
