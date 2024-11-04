@@ -39,5 +39,13 @@ func Test_CacheService_CacheItem_Success(t *testing.T) {
 	_ = cacheItem(TEST_KEY, data, int64(4), int64(0), channel)
 	res := cs.Redis[TEST_KEY]
 	assert.Equal(t, 8, len(res), "Expected %d frame clusters: got %d", 8, len(res))
+	assert.Equal(t, []byte("frame:oneframe:two"), res[0], "Expected")
+	assert.Equal(t, []byte("frame:threeframe:four"), res[1], "Expected")
+	assert.Equal(t, []byte("frame:fiveframe:six"), res[2], "Expected")
+	assert.Equal(t, []byte("frame:sevenframe:eight"), res[3], "Expected")
+	assert.Equal(t, []byte("frame:nineframe:A"), res[4], "Expected")
+	assert.Equal(t, []byte("frame:Bframe:C"), res[5], "Expected")
+	assert.Equal(t, []byte("frame:Dframe:E"), res[6], "Expected")
+	assert.Equal(t, []byte("frame:F"), res[7], "Expected")
 
 }
