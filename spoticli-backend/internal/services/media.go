@@ -49,9 +49,12 @@ func ReadID3v2Header(b []byte) []byte {
 // PartitionMp3Frames takes an entire
 // mp3 file andreturns a slice of frames
 func PartitionMp3Frames(b []byte) [][]byte {
+	if len(b) == 0 {
+		return [][]byte{}
+	}
 	syncStartv1, _ := hex.DecodeString("0FFE")
 	syncStartv2, _ := hex.DecodeString("FFE0")
-	if !bytes.HasPrefix(b, syncStartv1) || bytes.HasPrefix(b, syncStartv2) {
+	if !bytes.HasPrefix(b, syncStartv1) && !bytes.HasPrefix(b, syncStartv2) {
 		panic("Invalid Input: b does not start with sync header")
 	}
 	NextFrameStart := func(b []byte) int {
