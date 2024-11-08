@@ -91,3 +91,8 @@ func GetAudioPart(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusPartialContent)
 	w.Write(body)
 }
+func UploadMusicThroughPresigned(w http.ResponseWriter, r *http.Request) {
+	resource := "a7x/city_of_evil/bat_country"
+	url := audioService.UploadMusicThroughPresigned(resource)
+	w.Write([]byte(url))
+}

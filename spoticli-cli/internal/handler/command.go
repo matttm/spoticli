@@ -79,3 +79,5 @@ func StreamSong(id string) error {
 	fmt.Println("Song finished playing")
 	return nil
 }
+
+func UploadMusic(path string) {}

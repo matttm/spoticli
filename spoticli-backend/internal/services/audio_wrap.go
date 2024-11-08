@@ -14,3 +14,6 @@ func (s *AudioServiceWrap) GetAudio(id int) ([]byte, *int64, error) {
 func (s *AudioServiceWrap) StreamAudioSegment(id int, start, end *int64) ([]byte, *int, *int64, error) {
 	return StreamAudioSegment(id, start, end)
 }
+func (s *AudioServiceWrap) UploadMusicThroughPresigned(resource string) string {
+	return s.UploadMusicThroughPresigned(resource)
+}

@@ -53,3 +53,6 @@ func StreamAudioSegment(id int, start, end *int64) ([]byte, *int, *int64, error)
 	length := len(segment)
 	return segment, &length, &filesize, nil
 }
+func UploadMusicThroughPresigned(resource string) string {
+	return ""
+}
