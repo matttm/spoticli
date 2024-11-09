@@ -54,5 +54,10 @@ func StreamAudioSegment(id int, start, end *int64) ([]byte, *int, *int64, error)
 	return segment, &length, &filesize, nil
 }
 func UploadMusicThroughPresigned(resource string) string {
-	return ""
+	// segments := strings.Split(resource, "/")
+	// artist_name := segments[0]
+	// album_name := segments[1]
+	track_name := resource //  segments[2]
+	url, _ := storageService.PostPresignedUrl(track_name)
+	return url
 }

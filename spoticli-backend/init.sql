@@ -1,5 +1,6 @@
 CREATE DATABASE SPOTICLI_DB;
 
+-- TODO: trying adding localhost again after disconnecting from vpb
 CREATE USER 'ADMIN'@'%' IDENTIFIED WITH mysql_native_password BY 'ADMIN';
 GRANT ALL PRIVILEGES ON `SPOTICLI_DB`.* TO 'ADMIN'@'%';
 FLUSH PRIVILEGES;

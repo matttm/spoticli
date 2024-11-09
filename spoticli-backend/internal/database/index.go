@@ -1,4 +1,4 @@
-package datbase
+package database
 
 import (
 	"database/sql"
@@ -19,7 +19,7 @@ func InitializeDatabase() {
 	// TODO: ADD VALIDATION
 	db, err := sql.Open(
 		"mysql",
-		fmt.Sprintf("%s:%s@%s:%s/spoticli-db", user, pass, host, port),
+		fmt.Sprintf("%s:%s@tcp(%s:%s)/SPOTICLI_DB", user, pass, host, port),
 	)
 	if err != nil {
 		panic(err)
@@ -28,6 +28,9 @@ func InitializeDatabase() {
 	db.SetConnMaxLifetime(time.Minute * 3)
 	db.SetMaxOpenConns(10)
 	db.SetMaxIdleConns(10)
+
+	fmt.Println("Database was successfully connected to")
+
 	DB = db
 }
 
@@ -37,7 +40,11 @@ func CloseDB() error {
 
 func GetDatabase() *sql.DB {
 	if DB == nil {
-		panic("")
+		panic("Error: database not initialized")
 	}
 	return DB
 }
+
+//  func ExecSql[T any](s string) (T, error) {
+//  	return GetDatabase().Exec(s)
+//  }
