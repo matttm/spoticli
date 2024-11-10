@@ -15,7 +15,7 @@ func InsertFileMetaInfo(tx *sql.Tx, key_name, bucket_name string) {
 }
 func SelectAllFileMetaInfo() []*models.FileMetaInfo {
 	files := []*models.FileMetaInfo{}
-	query := "SELECT key_name, bucket_name SPOTICLI_DB.FILE_META_INFO;"
+	query := "SELECT key_name, bucket_name FROM SPOTICLI_DB.FILE_META_INFO;"
 	rows, err := DB.Query(query)
 	if err != nil {
 		panic(err)
