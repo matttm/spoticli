@@ -37,7 +37,7 @@ func GetStorageService() *StorageService {
 	return storageService
 }
 
-func (s *StorageService) PostPresignedUrl(key string) (string, error) {
+func (s *StorageService) PostPresignedUrl(key string) (*string, error) {
 	input := &s3.PutObjectInput{
 		Bucket:      TRACKS_BUCKET_NAME,
 		ContentType: MIME_MP3,
@@ -48,9 +48,9 @@ func (s *StorageService) PostPresignedUrl(key string) (string, error) {
 		input,
 	)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	return req.URL, nil
+	return &req.URL, nil
 }
 
 // GetPresignedUrl invokes presigned GetObject cmd

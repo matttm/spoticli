@@ -57,10 +57,15 @@ func StreamAudioSegment(id int, start, end *int64) ([]byte, *int, *int64, error)
 }
 func UploadMusicThroughPresigned(track_name string) string {
 	db := database.GetDatabase()
+	svc := GetStorageService()
 	tx, _ := db.Begin()
-	database.InsertFileMetaInfo(tx, track_name, *TRACKS_BUCKET_NAME)
-	url, _ := storageService.PostPresignedUrl(track_name)
+	database.InsertFileMetaInfo(tx, track_name, *TRACKS_BUCKET_NAME, 1)
+	url, err := svc.PostPresignedUrl(track_name)
+	if err != nil {
+		tx.Rollback()
+		panic(err)
+	}
 	// TODO: delegate tx finalizatipn to bg task to check for upload
 	_ = tx.Commit()
-	return url
+	return *url
 }

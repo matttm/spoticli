@@ -15,5 +15,5 @@ func (s *AudioServiceWrap) StreamAudioSegment(id int, start, end *int64) ([]byte
 	return StreamAudioSegment(id, start, end)
 }
 func (s *AudioServiceWrap) UploadMusicThroughPresigned(track_name string) string {
-	return s.UploadMusicThroughPresigned(track_name)
+	return UploadMusicThroughPresigned(track_name)
 }

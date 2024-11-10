@@ -6,9 +6,9 @@ import (
 	models "github.com/matttm/spoticli/spoticli-models"
 )
 
-func InsertFileMetaInfo(tx *sql.Tx, key_name, bucket_name string) {
-	query := "INSERT INTO SPOTICLI_DB.FILE_META_INFO (key_name, bucket_name) VALUES (?, ?);"
-	_, err := tx.Exec(query, key_name, bucket_name)
+func InsertFileMetaInfo(tx *sql.Tx, key_name, bucket_name string, file_type_cd int) {
+	query := "INSERT INTO SPOTICLI_DB.FILE_META_INFO (key_name, bucket_name, file_type_cd) VALUES (?, ?, ?);"
+	_, err := tx.Exec(query, key_name, bucket_name, file_type_cd)
 	if err != nil {
 		panic(err)
 	}
