@@ -1,6 +1,8 @@
 // Package services
 package services
 
+import "github.com/matttm/spoticli/spoticli-backend/internal/database"
+
 // GetPresignedUrl gets a presigned url
 // for downloading an object from s3
 func GetPresignedUrl(id int) (string, error) {
@@ -53,11 +55,12 @@ func StreamAudioSegment(id int, start, end *int64) ([]byte, *int, *int64, error)
 	length := len(segment)
 	return segment, &length, &filesize, nil
 }
-func UploadMusicThroughPresigned(resource string) string {
-	// segments := strings.Split(resource, "/")
-	// artist_name := segments[0]
-	// album_name := segments[1]
-	track_name := resource //  segments[2]
+func UploadMusicThroughPresigned(track_name string) string {
+	db := database.GetDatabase()
+	tx, _ := db.Begin()
+	database.InsertFileMetaInfo(tx, track_name, *TRACKS_BUCKET_NAME)
 	url, _ := storageService.PostPresignedUrl(track_name)
+	// TODO: delegate tx finalizatipn to bg task to check for upload
+	_ = tx.Commit()
 	return url
 }
