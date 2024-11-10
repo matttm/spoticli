@@ -16,8 +16,8 @@ USE SPOTICLI_DB;
 --  	PRIMARY KEY (id)
 --  );
 CREATE TABLE FILE_TYPE (
-	cd INT NOT NULL,
-	desc VARCHAR (64) NOT NULL,
+	cd INT NOT NULL UNIQUE,
+	description VARCHAR (64) NOT NULL,
 	PRIMARY KEY (cd)
 );
 CREATE TABLE FILE_META_INFO (
@@ -28,7 +28,7 @@ CREATE TABLE FILE_META_INFO (
 	file_type_cd INT NOT NULL,
 	--  file_type VARCHAR (64) NOT NULL,
 	--  file_size INT NOT NULL,
-  	CONSTRAINT fk_info_type FOREIGN KEY (cd)  
+  	CONSTRAINT fk_info_type FOREIGN KEY (file_type_cd)  
   	REFERENCES FILE_TYPE (cd)
   	ON DELETE CASCADE  
   	ON UPDATE CASCADE,

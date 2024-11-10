@@ -7,7 +7,7 @@ import (
 
 func AttachFileMetaInfoRouter(files *mux.Router) *mux.Router {
 
-	get := files.Path("/{id:[0-9]+}").Methods("GET")
+	get := files.Path("/{cd}").Methods("GET")
 	get.HandlerFunc(controllers.GetAllFilesOfType)
 
 	return files

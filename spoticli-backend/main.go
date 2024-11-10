@@ -18,6 +18,7 @@ func main() {
 
 	r.HandleFunc("/", HealthHandler)
 	routers.AttachAudioRouter(r.PathPrefix("/audio").Subrouter())
+	routers.AttachFileMetaInfoRouter(r.PathPrefix("/files").Subrouter())
 
 	datbase.InitializeDatabase()
 
