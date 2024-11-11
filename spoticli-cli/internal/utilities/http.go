@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
+	"strings"
 	"sync"
 
 	"github.com/gopxl/beep/v2"
@@ -103,6 +105,32 @@ func GetBufferedAudioSegment(id string, seg *models.AudioSegment) (beep.StreamSe
 
 func UploadFileViaPresign(filepath string, wg *sync.WaitGroup) {
 	fmt.Printf("Spawning thread to handle upload for %s\n", filepath)
+	segs := strings.Split(filepath, "/")
+	filename := segs[len(segs)-1]
+	// TODO: move filename from url to body
+	url := fmt.Sprintf("http://%s/audio/%s", config.SERVER_URL, filename)
+	res, err := getClient().Post(url, "application/json", nil)
+	if err != nil {
+		panic(err)
+	}
+	defer res.Body.Close()
+	b, err := io.ReadAll(res.Body)
+	if err != nil {
+		panic(err)
+	}
+	url = string(b)
+	fmt.Printf("Put to %s", url)
+	file, _ := os.Open(filepath)
+	defer file.Close()
+	req, err := http.NewRequest(http.MethodPut, url, file)
+	if err != nil {
+		panic(err)
+	}
+	res, err = getClient().Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer res.Body.Close()
 	defer wg.Done()
 }
 
