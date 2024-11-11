@@ -41,8 +41,8 @@ func main() {
 				Usage:   "song <action>",
 				Subcommands: []*cli.Command{
 					{
-						Name:        "bulk-upload",
-						Usage:       "bulk-upload <path>",
+						Name:        "upload",
+						Usage:       "upload <path>",
 						Description: "Uploads a directory of music using a presigned url",
 						Action: func(cCtx *cli.Context) error {
 							path := cCtx.Args().Get(0)

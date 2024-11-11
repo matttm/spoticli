@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"sync"
 
 	"github.com/gopxl/beep/v2"
 	"github.com/gopxl/beep/v2/mp3"
@@ -98,6 +99,11 @@ func GetBufferedAudioSegment(id string, seg *models.AudioSegment) (beep.StreamSe
 		panic(err)
 	}
 	return streamer, format
+}
+
+func UploadFileViaPresign(filepath string, wg *sync.WaitGroup) {
+	fmt.Printf("Spawning thread to handle upload for %s\n", filepath)
+	defer wg.Done()
 }
 
 func getClient() *http.Client {
