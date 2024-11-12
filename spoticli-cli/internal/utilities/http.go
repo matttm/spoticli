@@ -119,17 +119,28 @@ func UploadFileViaPresign(filepath string, wg *sync.WaitGroup) {
 		panic(err)
 	}
 	url = string(b)
-	fmt.Printf("Put to %s", url)
-	file, _ := os.Open(filepath)
-	defer file.Close()
+	fmt.Printf("Put to %s\n", url)
+	// fmt.Printf("Opening %s\n", filepath)
+	file, err := os.Open(filepath)
+	if err != nil {
+		panic(err)
+	}
+	stat, _ := file.Stat()
+	//  fmt.Printf("file %s", file)
+	//  defer file.Close() -- no needed as it should be being handled by 'Do' method
 	req, err := http.NewRequest(http.MethodPut, url, file)
 	if err != nil {
 		panic(err)
 	}
+	req.Header["Content-Type"] = []string{"audio/mp3"}
+	req.ContentLength = stat.Size()
 	res, err = getClient().Do(req)
 	if err != nil {
 		panic(err)
 	}
+	fmt.Printf("%v object %v with presigned URL returned %v.", req.Method,
+		filename, res.StatusCode)
+	fmt.Println(strings.Repeat("-", 88))
 	defer res.Body.Close()
 	defer wg.Done()
 }

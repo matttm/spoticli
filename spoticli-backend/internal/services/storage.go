@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"sync"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -39,13 +40,16 @@ func GetStorageService() *StorageService {
 
 func (s *StorageService) PostPresignedUrl(key string) (*string, error) {
 	input := &s3.PutObjectInput{
-		Bucket:      TRACKS_BUCKET_NAME,
-		ContentType: MIME_MP3,
-		Key:         aws.String(key),
+		Bucket: TRACKS_BUCKET_NAME,
+		//  ContentType: MIME_MP3,
+		Key: aws.String(key),
 	}
 	req, err := s.psClient.PresignPutObject(
 		context.TODO(),
 		input,
+		func(opts *s3.PresignOptions) {
+			opts.Expires = time.Duration(60 * int64(time.Second))
+		},
 	)
 	if err != nil {
 		return nil, err
