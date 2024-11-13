@@ -17,5 +17,6 @@ func GetAllFilesOfType(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
+	w.Header().Add("Content-Type", "application/json")
 	w.Write(b)
 }
