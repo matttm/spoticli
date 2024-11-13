@@ -1,6 +1,7 @@
 package utilities
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -12,6 +13,7 @@ import (
 	"github.com/gopxl/beep/v2/mp3"
 	"github.com/matttm/spoticli/spoticli-cli/internal/config"
 	"github.com/matttm/spoticli/spoticli-cli/internal/models"
+	ext_models "github.com/matttm/spoticli/spoticli-models"
 )
 
 // GetBytesOpenReader gets an item from the backend and returns
@@ -145,6 +147,25 @@ func UploadFileViaPresign(filepath string, wg *sync.WaitGroup) {
 	defer wg.Done()
 }
 
+func GetAllFilesOfType(cd int) []ext_models.FileMetaInfo {
+	var ret []ext_models.FileMetaInfo
+	// TODO: change to query param
+	url := fmt.Sprintf("http://%s/files/%d", config.SERVER_URL, cd)
+	res, err := getClient().Get(url)
+	if err != nil {
+		panic(err)
+	}
+	defer res.Body.Close()
+	b, err := io.ReadAll(res.Body)
+	if err != nil {
+		panic(err)
+	}
+	err = json.Unmarshal(b, &ret)
+	if err != nil {
+		panic(err)
+	}
+	return ret
+}
 func getClient() *http.Client {
 	return new(http.Client)
 }

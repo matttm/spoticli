@@ -93,3 +93,11 @@ func UploadMusic(path string) error {
 	fmt.Println("uploaded all songs")
 	return nil
 }
+
+func ListFiles(cd int) error {
+	files := utilities.GetAllFilesOfType(cd)
+	for _, file := range files {
+		fmt.Printf("%s\n", file.Key_name)
+	}
+	return nil
+}
