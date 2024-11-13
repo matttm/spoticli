@@ -8,7 +8,7 @@ A program to stream music from the command line. This program can stream or down
 
 This backend processing includes removing the ID3v2 header from the beginning of the mp3 file, and then partitioning it into clusters of mp3 frames, to ensure every payload sent to the frontend contains the mp3 header.
 
-See the README in Spoticli-backend for more on the algorithm.
+See the README in [spoticli-backend](https://github.com/matttm/spoticli/tree/main/spoticli-backend#spoticli-backend) for more on the algorithm and backend architecture.
 
 ## Getting Started
 
