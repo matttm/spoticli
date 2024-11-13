@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/gopxl/beep/v2"
@@ -77,5 +78,18 @@ func StreamSong(id string) error {
 	fmt.Println("Song starts now")
 	_ = <-done
 	fmt.Println("Song finished playing")
+	return nil
+}
+
+func UploadMusic(path string) error {
+	fmt.Printf("opening %s\n", path)
+	var wg sync.WaitGroup
+	files := utilities.CollectFiles(path, ".mp3")
+	for _, file := range files {
+		wg.Add(1)
+		go utilities.UploadFileViaPresign(file, &wg)
+	}
+	wg.Wait()
+	fmt.Println("uploaded all songs")
 	return nil
 }

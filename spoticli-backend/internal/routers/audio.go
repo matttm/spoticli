@@ -16,6 +16,8 @@ func AttachAudioRouter(audio *mux.Router) *mux.Router {
 	stream := audio.Path("/proxy/stream/{id:[0-9]+}").Methods("GET")
 	stream.HandlerFunc(controllers.GetAudioPart)
 
+	upload := audio.Path("/{track_name}").Methods("POST")
+	upload.HandlerFunc(controllers.UploadMusicThroughPresigned)
 	// post := router.Methods("POST")
 	// post.HandlerFunc(nil)
 

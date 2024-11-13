@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"sync"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -12,12 +13,14 @@ import (
 
 // A StorageService interacts directly with s3
 type StorageService struct {
-	client   *s3.Client
+	client *s3.Client
+	// for unauthenticated users:
 	psClient *s3.PresignClient
 }
 
 var storageLock = &sync.Mutex{}
 var TRACKS_BUCKET_NAME = aws.String("spoticli-tracks")
+var MIME_MP3 = aws.String("audio/mp3")
 
 var storageService *StorageService
 
@@ -33,6 +36,25 @@ func GetStorageService() *StorageService {
 		}
 	}
 	return storageService
+}
+
+func (s *StorageService) PostPresignedUrl(key string) (*string, error) {
+	input := &s3.PutObjectInput{
+		Bucket: TRACKS_BUCKET_NAME,
+		//  ContentType: MIME_MP3,
+		Key: aws.String(key),
+	}
+	req, err := s.psClient.PresignPutObject(
+		context.TODO(),
+		input,
+		func(opts *s3.PresignOptions) {
+			opts.Expires = time.Duration(60 * int64(time.Second))
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &req.URL, nil
 }
 
 // GetPresignedUrl invokes presigned GetObject cmd

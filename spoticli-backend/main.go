@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/matttm/spoticli/spoticli-backend/internal/database"
+	datbase "github.com/matttm/spoticli/spoticli-backend/internal/database"
 	"github.com/matttm/spoticli/spoticli-backend/internal/routers"
 	"github.com/matttm/spoticli/spoticli-models"
 	"github.com/rs/cors"
@@ -17,6 +19,10 @@ func main() {
 
 	r.HandleFunc("/", HealthHandler)
 	routers.AttachAudioRouter(r.PathPrefix("/audio").Subrouter())
+	routers.AttachFileMetaInfoRouter(r.PathPrefix("/files").Subrouter())
+
+	datbase.InitializeDatabase()
+	defer database.CloseDB()
 
 	http.Handle("/", r)
 	fmt.Println("Listening on localhost:4200")

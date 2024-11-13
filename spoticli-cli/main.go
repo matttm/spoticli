@@ -41,10 +41,12 @@ func main() {
 				Usage:   "song <action>",
 				Subcommands: []*cli.Command{
 					{
-						Name:  "ls",
-						Usage: "ls",
+						Name:        "upload",
+						Usage:       "upload <path>",
+						Description: "Uploads a directory of music using a presigned url",
 						Action: func(cCtx *cli.Context) error {
-							fmt.Println("Feature not implemented")
+							path := cCtx.Args().Get(0)
+							handler.UploadMusic(path)
 							return nil
 						},
 					},
