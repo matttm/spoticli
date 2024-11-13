@@ -68,6 +68,15 @@ func main() {
 							return nil
 						},
 					},
+					{
+						Name:  "ls",
+						Usage: "ls",
+						Action: func(cCtx *cli.Context) error {
+							cd := 1 //   cCtx.Args().Get(0)
+							handler.ListFiles(cd)
+							return nil
+						},
+					},
 				},
 			},
 		},
