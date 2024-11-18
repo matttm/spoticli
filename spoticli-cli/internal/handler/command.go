@@ -8,6 +8,7 @@ import (
 
 	"github.com/gopxl/beep/v2"
 	"github.com/gopxl/beep/v2/speaker"
+	"github.com/manifoldco/promptui"
 	"github.com/matttm/spoticli/spoticli-cli/internal/config"
 	"github.com/matttm/spoticli/spoticli-cli/internal/models"
 	"github.com/matttm/spoticli/spoticli-cli/internal/utilities"
@@ -100,4 +101,19 @@ func ListFiles(cd int) error {
 		fmt.Printf("%s\n", file.Key_name)
 	}
 	return nil
+}
+func promptSongs() (string, error) {
+	files := utilities.GetAllFilesOfType(cd)
+	prompt := promptui.Select{
+		Label: "Select Song",
+		Items: []string{"Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
+			"Saturday", "Sunday"},
+	}
+
+	_, result, err := prompt.Run()
+
+	if err != nil {
+		fmt.Printf("Prompt failed %v\n", err)
+		return
+	}
 }

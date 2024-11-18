@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"encoding/hex"
 	"slices"
-
-	models "github.com/matttm/spoticli/spoticli-models"
 )
 
 type MediaService struct {
@@ -19,12 +17,6 @@ func GetMusiceService() *MediaService {
 		println("MusicService Instantiated")
 	}
 	return mediaService
-}
-func GetTrack(id int) (*models.Track, error) {
-	t := new(models.Track)
-	t.Title = "bat_country.mp3"
-	t.FileSize = 7504586
-	return t, nil
 }
 
 // ReadID3v2Header takes a []byte and returns a

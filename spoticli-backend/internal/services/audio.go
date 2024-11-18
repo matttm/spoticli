@@ -6,8 +6,8 @@ import "github.com/matttm/spoticli/spoticli-backend/internal/database"
 // GetPresignedUrl gets a presigned url
 // for downloading an object from s3
 func GetPresignedUrl(id int) (string, error) {
-	t, _ := GetTrack(id)
-	key := t.Title
+	t, _ := GetFileById(id)
+	key := t.Key_name
 	svc := GetStorageService()
 	url, err := svc.GetPresignedUrl(key)
 	if err != nil {
@@ -20,8 +20,8 @@ func GetPresignedUrl(id int) (string, error) {
 // audio object on success and a *int referring to
 // content's size
 func GetAudio(id int) ([]byte, *int64, error) {
-	t, _ := GetTrack(id)
-	key := t.Title
+	t, _ := GetFileById(id)
+	key := t.Key_name
 	svc := GetStorageService()
 	// TODO: rewrite and use getaudiopart
 	body, err := svc.DownloadFile(key, nil)
@@ -34,18 +34,18 @@ func GetAudio(id int) ([]byte, *int64, error) {
 
 // StreamAudioSegment
 func StreamAudioSegment(id int, start, end *int64) ([]byte, *int, *int64, error) {
-	t, _ := GetTrack(id)
+	t, _ := GetFileById(id)
 	var filesize int64
-	// key := t.Title
+	// key := t.Key_name
 	if *start == 0 {
 		*end = GetConfigService().GetConfigValueInt64("STREAM_SEGMENT_SIZE")
 	}
-	if *start >= int64(t.FileSize) {
+	if *start >= int64(t.filesize) {
 		panic("Invalid start pos")
 		var b []byte
 		return b, nil, nil, nil
 	}
-	key := t.Title
+	key := t.Key_name
 	svc := GetStorageService()
 	// TODO: rewrite and use getaudiopart
 	segment, filesize, err := svc.StreamFile(key, start, end)

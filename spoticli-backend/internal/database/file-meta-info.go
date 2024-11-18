@@ -30,3 +30,15 @@ func SelectAllFileMetaInfo() []*models.FileMetaInfo {
 	}
 	return files
 }
+func SelectOneFileMetaInfo(id int) *models.FileMetaInfo {
+	query := "SELECT key_name, bucket_name FROM SPOTICLI_DB.FILE_META_INFO WHERE ID = ?;"
+	row := DB.QueryRow(query, id)
+	if row == nil {
+		panic("")
+	}
+	file := new(models.FileMetaInfo)
+	if err := row.Scan(&file.Key_name, &file.Bucket_name); err != nil {
+		panic(err)
+	}
+	return file
+}
