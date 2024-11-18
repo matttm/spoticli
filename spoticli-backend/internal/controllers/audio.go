@@ -3,7 +3,9 @@
 package controllers
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
 
@@ -97,8 +99,16 @@ func UploadMusicThroughPresigned(w http.ResponseWriter, r *http.Request) {
 	// segments := strings.Split(resource, "/")
 	// artist_name := segments[0]
 	// album_name := segments[1]
-	vars := mux.Vars(r) //  segments[2]
-	track_name := vars["track_name"]
-	url := audioService.UploadMusicThroughPresigned(track_name)
+	var input map[string]string
+	body := r.Body
+	b, err := io.ReadAll(body)
+	if err != nil {
+	}
+	defer body.Close()
+	err = json.Unmarshal(b, input)
+	if err != nil {
+	}
+	filesize, _ := strconv.Atoi(input["File_size"])
+	url := audioService.UploadMusicThroughPresigned(input["Key_name"], filesize)
 	w.Write([]byte(url))
 }
