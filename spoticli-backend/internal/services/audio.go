@@ -1,7 +1,11 @@
 // Package services
 package services
 
-import "github.com/matttm/spoticli/spoticli-backend/internal/database"
+import (
+	"fmt"
+
+	"github.com/matttm/spoticli/spoticli-backend/internal/database"
+)
 
 // GetPresignedUrl gets a presigned url
 // for downloading an object from s3
@@ -41,9 +45,8 @@ func StreamAudioSegment(id int, start, end *int64) ([]byte, *int, *int64, error)
 		*end = GetConfigService().GetConfigValueInt64("STREAM_SEGMENT_SIZE")
 	}
 	if *start >= int64(t.File_size) {
-		panic("Invalid start pos")
-		var b []byte
-		return b, nil, nil, nil
+		err := fmt.Errorf("Invalid start pos: %d >= %d", *start, t.File_size)
+		panic(err)
 	}
 	key := t.Key_name
 	svc := GetStorageService()

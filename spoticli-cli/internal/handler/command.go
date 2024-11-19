@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"sync"
 	"time"
 
@@ -27,7 +28,9 @@ func DownloadSong(id string) error {
 	os.WriteFile("test.mp3", b, 0664)
 	return nil
 }
-func StreamSong(id string) error {
+func StreamSong() error {
+	_id, _ := promptSongs()
+	id := strconv.Itoa(_id)
 	fmt.Println(id)
 	sr := beep.SampleRate(44100)
 	speaker.Init(sr, sr.N(time.Second/10))
@@ -39,7 +42,7 @@ func StreamSong(id string) error {
 	speaker.Play(&queue)
 
 	// creating struct to follow boundaries
-	seg := models.AudioSegment{StartByte: 0, EndByte: -1, SegmentLength: 0}
+	seg := models.AudioSegment{StartByte: -1, EndByte: -1, SegmentLength: 0}
 	var streamer beep.StreamSeekCloser
 	// then perform loop for remainder of song
 	ticker := time.NewTicker(time.Second * config.SECONDS_TO_WAIT_PER_FRAMES)
@@ -88,7 +91,7 @@ func UploadMusic(path string) error {
 	files := utilities.CollectFiles(path, ".mp3")
 	for _, file := range files {
 		wg.Add(1)
-		go utilities.UploadFileViaPresign(file, &wg)
+		go utilities.UploadFileViaPresign(file.Path, file.Size, &wg)
 	}
 	wg.Wait()
 	fmt.Println("uploaded all songs")
@@ -102,18 +105,26 @@ func ListFiles(cd int) error {
 	}
 	return nil
 }
-func promptSongs() (string, error) {
+func promptSongs() (int, error) {
+	cd := 1
 	files := utilities.GetAllFilesOfType(cd)
+	songNames := []string{}
+	for _, f := range files {
+		songNames = append(songNames, f.Key_name)
+	}
 	prompt := promptui.Select{
 		Label: "Select Song",
-		Items: []string{"Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
-			"Saturday", "Sunday"},
+		Items: songNames,
 	}
 
 	_, result, err := prompt.Run()
-
 	if err != nil {
-		fmt.Printf("Prompt failed %v\n", err)
-		return
+		return -1, fmt.Errorf("Prompt failed %v\n", err)
 	}
+	for _, f := range files {
+		if result == f.Key_name {
+			return f.Id, nil
+		}
+	}
+	return -1, fmt.Errorf("Key not found")
 }
