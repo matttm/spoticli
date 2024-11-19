@@ -52,10 +52,9 @@ func main() {
 					},
 					{
 						Name:  "play",
-						Usage: "play <song-id",
+						Usage: "play",
 						Action: func(cCtx *cli.Context) error {
-							id := cCtx.Args().Get(0)
-							handler.StreamSong(id)
+							handler.StreamSong()
 							return nil
 						},
 					},

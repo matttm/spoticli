@@ -1,6 +1,7 @@
 package utilities
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -88,7 +89,7 @@ func GetBufferedAudioSegment(id string, seg *models.AudioSegment) (beep.StreamSe
 	dataStream := GetBytesOpenReader(
 		func(r *http.Request) {
 			// TODO: REMOVE HEADER ON FIRST SEND
-			if seg.StartByte != 0 {
+			if seg.StartByte >= 0 {
 				r.Header.Add(
 					"Range",
 					fmt.Sprintf("bytes=%d-%d", seg.StartByte, seg.EndByte),
@@ -105,13 +106,17 @@ func GetBufferedAudioSegment(id string, seg *models.AudioSegment) (beep.StreamSe
 	return streamer, format
 }
 
-func UploadFileViaPresign(filepath string, wg *sync.WaitGroup) {
+func UploadFileViaPresign(filepath string, filesize int64, wg *sync.WaitGroup) {
 	fmt.Printf("Spawning thread to handle upload for %s\n", filepath)
 	segs := strings.Split(filepath, "/")
 	filename := segs[len(segs)-1]
 	// TODO: move filename from url to body
-	url := fmt.Sprintf("http://%s/audio/%s", config.SERVER_URL, filename)
-	res, err := getClient().Post(url, "application/json", nil)
+	var meta ext_models.FileMetaInfo
+	meta.Key_name = filename
+	meta.File_size = int(filesize)
+	payload, _ := json.Marshal(meta)
+	url := fmt.Sprintf("http://%s/audio", config.SERVER_URL)
+	res, err := getClient().Post(url, "application/json", bytes.NewBuffer(payload))
 	if err != nil {
 		panic(err)
 	}

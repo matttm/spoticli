@@ -29,7 +29,7 @@ CREATE TABLE FILE_META_INFO (
 	bucket_name VARCHAR (256) NOT NULL,
 	file_type_cd INT NOT NULL,
 	--  file_type VARCHAR (64) NOT NULL,
-	--  file_size INT NOT NULL,
+	file_size INT NOT NULL,
   	CONSTRAINT fk_info_type FOREIGN KEY (file_type_cd)  
   	REFERENCES FILE_TYPE (cd)
   	ON DELETE CASCADE  

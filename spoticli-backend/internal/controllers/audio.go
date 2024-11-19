@@ -3,12 +3,15 @@
 package controllers
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
 
 	"github.com/gorilla/mux"
 	"github.com/matttm/spoticli/spoticli-backend/internal/services"
+	models "github.com/matttm/spoticli/spoticli-models"
 )
 
 var audioService services.ApiAudioService = &services.AudioServiceWrap{}
@@ -97,8 +100,18 @@ func UploadMusicThroughPresigned(w http.ResponseWriter, r *http.Request) {
 	// segments := strings.Split(resource, "/")
 	// artist_name := segments[0]
 	// album_name := segments[1]
-	vars := mux.Vars(r) //  segments[2]
-	track_name := vars["track_name"]
-	url := audioService.UploadMusicThroughPresigned(track_name)
+	var input models.FileMetaInfo
+	body := r.Body
+	b, err := io.ReadAll(body)
+	if err != nil {
+		panic(err)
+	}
+	defer body.Close()
+	err = json.Unmarshal(b, &input)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(input)
+	url := audioService.UploadMusicThroughPresigned(input.Key_name, input.File_size)
 	w.Write([]byte(url))
 }

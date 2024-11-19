@@ -1,13 +1,17 @@
 // Package services
 package services
 
-import "github.com/matttm/spoticli/spoticli-backend/internal/database"
+import (
+	"fmt"
+
+	"github.com/matttm/spoticli/spoticli-backend/internal/database"
+)
 
 // GetPresignedUrl gets a presigned url
 // for downloading an object from s3
 func GetPresignedUrl(id int) (string, error) {
-	t, _ := GetTrack(id)
-	key := t.Title
+	t, _ := GetFileById(id)
+	key := t.Key_name
 	svc := GetStorageService()
 	url, err := svc.GetPresignedUrl(key)
 	if err != nil {
@@ -20,8 +24,8 @@ func GetPresignedUrl(id int) (string, error) {
 // audio object on success and a *int referring to
 // content's size
 func GetAudio(id int) ([]byte, *int64, error) {
-	t, _ := GetTrack(id)
-	key := t.Title
+	t, _ := GetFileById(id)
+	key := t.Key_name
 	svc := GetStorageService()
 	// TODO: rewrite and use getaudiopart
 	body, err := svc.DownloadFile(key, nil)
@@ -34,18 +38,17 @@ func GetAudio(id int) ([]byte, *int64, error) {
 
 // StreamAudioSegment
 func StreamAudioSegment(id int, start, end *int64) ([]byte, *int, *int64, error) {
-	t, _ := GetTrack(id)
+	t, _ := GetFileById(id)
 	var filesize int64
-	// key := t.Title
+	// key := t.Key_name
 	if *start == 0 {
 		*end = GetConfigService().GetConfigValueInt64("STREAM_SEGMENT_SIZE")
 	}
-	if *start >= int64(t.FileSize) {
-		panic("Invalid start pos")
-		var b []byte
-		return b, nil, nil, nil
+	if *start >= int64(t.File_size) {
+		err := fmt.Errorf("Invalid start pos: %d >= %d", *start, t.File_size)
+		panic(err)
 	}
-	key := t.Title
+	key := t.Key_name
 	svc := GetStorageService()
 	// TODO: rewrite and use getaudiopart
 	segment, filesize, err := svc.StreamFile(key, start, end)
@@ -55,11 +58,11 @@ func StreamAudioSegment(id int, start, end *int64) ([]byte, *int, *int64, error)
 	length := len(segment)
 	return segment, &length, &filesize, nil
 }
-func UploadMusicThroughPresigned(track_name string) string {
+func UploadMusicThroughPresigned(track_name string, file_size int) string {
 	db := database.GetDatabase()
 	svc := GetStorageService()
 	tx, _ := db.Begin()
-	database.InsertFileMetaInfo(tx, track_name, *TRACKS_BUCKET_NAME, 1)
+	database.InsertFileMetaInfo(tx, track_name, *TRACKS_BUCKET_NAME, 1, file_size)
 	url, err := svc.PostPresignedUrl(track_name)
 	if err != nil {
 		tx.Rollback()
