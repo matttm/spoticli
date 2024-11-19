@@ -40,6 +40,22 @@ Also a feature of this backend is when doing a range request, only the start pos
 
 First thing is environment variables. Source the following to your environment before running the backend.
 ```bash
+# variables determining processing
+export STREAM_SEGMENT_SIZE=1000000
+export FRAME_CLUSTER_SIZE=30
+
+# database
+export DB_HOST="localhost"
+export DB_PORT=""3306
+export DB_USERNAME="ADMIN"
+export DB_PASSWORD="ADMIN"
+
+# aws variables
+export AWS_ACCESS_KEY_ID="key"
+export AWS_SECRET_ACCESS_KEY="secret"
+export AWS_REGION=us-east-1
+
+
 ```
 
 Once these are in your enironment, you can run the backend in the terminal as follows
