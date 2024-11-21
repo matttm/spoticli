@@ -36,7 +36,7 @@ The frame slices are then grouped together, such that there is x frames per clus
 
 Also a feature of this backend is when doing a range request, only the start position is respected.
 
-(Reference of file structure)[https://www.codeproject.com/Articles/8295/MPEG-Audio-Frame-Header#MPEGAudioFrameHeader]
+[Reference of file structure](https://www.codeproject.com/Articles/8295/MPEG-Audio-Frame-Header#MPEGAudioFrameHeader)
 
 ## Getting started
 
