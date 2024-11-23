@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/hex"
 	"flag"
 	"fmt"
 	"io"
@@ -35,7 +34,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("Bytes: %s", hex.EncodeToString(b))
+	b = services.ReadID3v2Header(b)
 	frames := services.PartitionMp3Frames(b)
 	if len(frames) <= 0 {
 		panic("No frames")
