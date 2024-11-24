@@ -45,11 +45,12 @@ func ReadID3v2Header(b []byte) []byte {
 }
 
 func getNextFrameHeaderIndex(b []byte) int {
-	frameHeader := b[:32]
+	frameHeader := b[:4]
+	fmt.Printf("%x \n\n", frameHeader)
 	// first 11 bits are sync word, so skip them
-	mpegVersion := ((frameHeader[2] & 1) << 1) | (frameHeader[3] >> 7)
+	mpegVersion := ((frameHeader[1] >> 4) & 0b11)
 	fmt.Printf("MPEG Version %02b\n", mpegVersion)
-	layerDesc := (frameHeader[5] >> 5) & 3 // getting bits 5 and 6 as xx
+	layerDesc := (frameHeader[1] >> 1) & 0b11 // getting bits 5 and 6 as xx
 	fmt.Printf("MPEG Layer %02b\n", layerDesc)
 
 	versionStr := constants.VersionMap[int(mpegVersion)]
