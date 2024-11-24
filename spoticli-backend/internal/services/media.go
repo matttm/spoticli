@@ -2,10 +2,9 @@ package services
 
 import (
 	"bytes"
-	"encoding/hex"
 	"fmt"
-	"math"
-	"slices"
+
+	"github.com/matttm/spoticli/spoticli-backend/internal/constants"
 )
 
 type MediaService struct {
@@ -34,14 +33,45 @@ func ReadID3v2Header(b []byte) []byte {
 	fmt.Printf("Major Version %d \nRevision %d\n", major, revision)
 	flags := b[5]
 	fmt.Printf("flags byte %08b\n", flags)
-	// the following size bytes are sync safe so 7-bits
-	//  s1 := int(b[6])
-	//  s2 := int(b[7])
+	// nhe following size bytes are sync safe so 7-bits
+	s1 := int(b[6])
+	s2 := int(b[7])
 	s3 := int(b[8])
 	s4 := int(b[9])
-	size := s3*int(math.Pow(2, 7)) + s4 + 10
+
+	size := (s1 << (7 * 3)) + (s2 << (7 * 2)) + (s3 << 7) + s4 + 10
 	fmt.Printf("ID3v2 tag size is %d bytes\n", size)
-	return b[size+1:]
+	return b[size:]
+}
+
+func getNextFrameHeaderIndex(b []byte) int {
+	frameHeader := b[:32]
+	// first 11 bits are sync word, so skip them
+	mpegVersion := ((frameHeader[2] & 1) << 1) | (frameHeader[3] >> 7)
+	fmt.Printf("MPEG Version %02b\n", mpegVersion)
+	layerDesc := (frameHeader[5] >> 5) & 3 // getting bits 5 and 6 as xx
+	fmt.Printf("MPEG Layer %02b\n", layerDesc)
+
+	versionStr := constants.VersionMap[int(mpegVersion)]
+	layerStr := constants.LayerMap[int(layerDesc)]
+	versionLayerStr := fmt.Sprintf("%s,%s", versionStr, layerStr)
+	bitRateIndex := frameHeader[5] & 15
+	bitRate := constants.BitrateMap[bitRateIndex][versionLayerStr]
+	samplingRateIndex := (frameHeader[6] >> 4) & 15
+	samplingRate := constants.SamplingRateMap[samplingRateIndex][versionStr]
+	fmt.Printf("BitRate %d \n Sampling rate %d \n", bitRate, samplingRate)
+	// For Layer I files us this formula:
+	//
+	//	FrameLengthInBytes = (12 * BitRate / SampleRate + Padding) * 4
+	//
+	// For Layer II & III files use this formula:
+	//
+	//	FrameLengthInBytes = 144 * BitRate / SampleRate + Padding
+	if layerDesc == 0b11 { // it is L1
+		return (12*bitRate/samplingRate + 0) * 4
+	} else {
+		return 144*bitRate/samplingRate + 0
+	}
 }
 
 // PartitionMp3Frames takes an entire
@@ -50,59 +80,19 @@ func PartitionMp3Frames(b []byte) [][]byte {
 	if len(b) == 0 {
 		return [][]byte{}
 	}
-	syncStart, _ := hex.DecodeString("FF")
-	// For Layer I files us this formula:
-	//
-	//	FrameLengthInBytes = (12 * BitRate / SampleRate + Padding) * 4
-	//
-	// For Layer II & III files use this formula:
-	//
-	//	FrameLengthInBytes = 144 * BitRate / SampleRate + Padding
-	NextFrameStart := func(b []byte) int {
-		ffIndex := bytes.LastIndex(b, syncStart) // ff is 1111 1111, so now check left and right byte for 111
-		BIT_COUNT_TO_BE_FOUND := 3
-		leftByte := b[ffIndex-1]
-		rightByte := b[ffIndex+1]
-		fmt.Printf("%08b, %08b, %08b", leftByte, b[ffIndex], rightByte)
-
-		BITS_FOUND := 0
-		// for i := range BIT_COUNT_TO_BE_FOUND {
-		// 	if leftByte&(1<<i) == 1 {
-		// 		BITS_FOUND += 1
-		// 		if BITS_FOUND == BIT_COUNT_TO_BE_FOUND {
-		// 			return ffIndex
-		// 		}
-		// 	} else {
-		// 		break
-		// 	}
-		// }
-		BITS_FOUND = 0
-		for i := range BIT_COUNT_TO_BE_FOUND {
-			if (rightByte>>(8-i-1))&1 == 1 {
-				BITS_FOUND += 1
-				if BITS_FOUND == BIT_COUNT_TO_BE_FOUND {
-					return ffIndex
-				}
-			} else {
-				break
-			}
-		}
-		fmt.Println("No possible sync seen")
-		return -1
-	}
 	var frames [][]byte
-	endIndex := len(b)
-	startIndex := NextFrameStart(b) // as asserted by above, this is a sync, so we'll add the length of sync togo to  header of following frame
-	for startIndex != -1 {
-		clip := b[startIndex:endIndex]
-		frames = append(frames, clip)
-		b = b[:startIndex]
-		startIndex = NextFrameStart(b)
-		if startIndex == -1 {
+	for {
+		nextStartIndex := getNextFrameHeaderIndex(b)
+		break
+		if nextStartIndex > len(b) {
 			break
 		}
-		endIndex = len(b)
+		clip := b[:nextStartIndex]
+		frames = append(frames, clip)
+		b = b[nextStartIndex:]
+		if len(b) <= 0 {
+			break
+		}
 	}
-	slices.Reverse(frames)
 	return frames
 }
