@@ -39,6 +39,7 @@ func main() {
 	if len(frames) <= 0 {
 		panic("No frames")
 	}
+	fmt.Printf("Frame count %d", len(frames))
 
 	// make dir if itdowsnt exist
 	_, err = os.Stat(DIRECTORY_NAME)

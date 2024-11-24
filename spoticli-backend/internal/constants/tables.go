@@ -113,24 +113,24 @@ var BitrateMap = map[byte]map[string]int{
 // Define the 2D map with string keys and int values
 var SamplingRateMap = map[byte]map[string]int{
 	0b00: {
-		"MPEG1":   44100,
-		"MPEG2":   22050,
-		"MPEG2.5": 11025,
+		"V1":   44100,
+		"V2":   22050,
+		"V2.5": 11025,
 	},
 	0b01: {
-		"MPEG1":   48000,
-		"MPEG2":   24000,
-		"MPEG2.5": 12000,
+		"V1":   48000,
+		"V2":   24000,
+		"V2.5": 12000,
 	},
 	0b10: {
-		"MPEG1":   32000,
-		"MPEG2":   16000,
-		"MPEG2.5": 8000,
+		"V1":   32000,
+		"V2":   16000,
+		"V2.5": 8000,
 	},
 	0b11: {
-		"MPEG1":   0, // Assuming "reserv." means 0
-		"MPEG2":   0,
-		"MPEG2.5": 0,
+		"V1":   0, // Assuming "reserv." means 0
+		"V2":   0,
+		"V2.5": 0,
 	},
 }
 
