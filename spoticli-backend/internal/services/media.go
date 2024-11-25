@@ -44,7 +44,7 @@ func ReadID3v2Header(b []byte) []byte {
 	return b[size:]
 }
 
-func getCurrentFrameHeaderLength(b []byte) int {
+func getCurrentFrameLength(b []byte) int {
 	frameHeader := b[:4]
 	fmt.Printf("%x \n", frameHeader)
 	// first 11 bits are sync word, so skip them
@@ -64,13 +64,13 @@ func getCurrentFrameHeaderLength(b []byte) int {
 		panic(err)
 	}
 
-	samplingRateIndex := (frameHeader[2]) & 0b1111
+	samplingRateIndex := (frameHeader[2] >> 2) & 0b11
 	samplingRate := constants.SamplingRateMap[samplingRateIndex][versionStr]
-	if _, err := fmt.Printf("Sampling Rate Index %04b sampling rate %d \n", samplingRateIndex, samplingRate); err != nil {
+	if _, err := fmt.Printf("Sampling Rate Index %02b sampling rate %d \n", samplingRateIndex, samplingRate); err != nil {
 		panic(err)
 	}
-	padding := frameHeader[3] >> 7
-	fmt.Printf("padding bit %01b\n", padding)
+	padding := (frameHeader[2] >> 1) & 0b1
+	fmt.Printf("padding bit %08b \n", frameHeader[2])
 	// For Layer I files us this formula:
 	//
 	//	FrameLengthInBytes = (12 * BitRate / SampleRate + Padding) * 4
@@ -97,11 +97,11 @@ func PartitionMp3Frames(b []byte) [][]byte {
 	}
 	var frames [][]byte
 	for {
-		currentFrameLength := getCurrentFrameHeaderLength(b)
+		currentFrameLength := getCurrentFrameLength(b)
 		clip := b[:currentFrameLength]
 		frames = append(frames, clip)
 		b = b[currentFrameLength:]
-		if len(b) <= 0 {
+		if currentFrameLength <= 0 {
 			break
 		}
 		fmt.Printf("Frame count %d frame length %d \n\n", len(frames), currentFrameLength)
