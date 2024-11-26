@@ -9,10 +9,12 @@ import (
 	"github.com/matttm/spoticli/spoticli-backend/internal/services"
 )
 
+var fmiService services.FileMetaInfoServiceApi = &services.FileMetaInfoServiceWrap{}
+
 func GetAllFilesOfType(w http.ResponseWriter, r *http.Request) {
 	cdStr := mux.Vars(r)["cd"]
 	cd, _ := strconv.Atoi(cdStr)
-	files := services.GetAllFilesOfType(cd)
+	files := fmiService.GetAllFilesOfType(cd)
 	b, err := json.Marshal(files)
 	if err != nil {
 		panic(err)

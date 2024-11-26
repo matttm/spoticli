@@ -86,3 +86,17 @@ func (mr *MockApiAudioServiceMockRecorder) StreamAudioSegment(id, start, end any
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StreamAudioSegment", reflect.TypeOf((*MockApiAudioService)(nil).StreamAudioSegment), id, start, end)
 }
+
+// UploadMusicThroughPresigned mocks base method.
+func (m *MockApiAudioService) UploadMusicThroughPresigned(track_name string, file_size int) string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UploadMusicThroughPresigned", track_name, file_size)
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// UploadMusicThroughPresigned indicates an expected call of UploadMusicThroughPresigned.
+func (mr *MockApiAudioServiceMockRecorder) UploadMusicThroughPresigned(track_name, file_size any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UploadMusicThroughPresigned", reflect.TypeOf((*MockApiAudioService)(nil).UploadMusicThroughPresigned), track_name, file_size)
+}
