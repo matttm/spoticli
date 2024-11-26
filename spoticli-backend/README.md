@@ -39,7 +39,9 @@ The frame slices are then grouped together, such that there is x frames per clus
 Also a feature of this backend is when doing a range request, only the start position is respected.
 
 [Reference of file structure](https://www.codeproject.com/Articles/8295/MPEG-Audio-Frame-Header#MPEGAudioFrameHeader)
+
 [ID3v2 Spec](https://mutagen-specs.readthedocs.io/en/latest/id3/id3v2.4.0-structure.html)
+
 [MP3 frame anatomy](http://www.mp3-tech.org/programmer/frame_header.html)
 
 ## Getting started
