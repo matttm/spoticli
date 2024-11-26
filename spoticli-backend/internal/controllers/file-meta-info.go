@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/coder/flog"
 	"github.com/gorilla/mux"
 	"github.com/matttm/spoticli/spoticli-backend/internal/services"
 )
@@ -17,7 +18,7 @@ func GetAllFilesOfType(w http.ResponseWriter, r *http.Request) {
 	files := fmiService.GetAllFilesOfType(cd)
 	b, err := json.Marshal(files)
 	if err != nil {
-		panic(err)
+		flog.Errorf(err.Error())
 	}
 	w.Header().Add("Content-Type", "application/json")
 	w.Write(b)

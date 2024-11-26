@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/coder/flog"
+
 	"github.com/gorilla/mux"
 	"github.com/matttm/spoticli/spoticli-backend/internal/services"
 	models "github.com/matttm/spoticli/spoticli-models"
@@ -19,26 +21,26 @@ var audioService services.ApiAudioService = &services.AudioServiceWrap{}
 // GetPresignedUrl gets a presigned url for an object in s3
 // to be downloaded.
 func GetPresignedUrl(w http.ResponseWriter, r *http.Request) {
-	println("getting presigned url")
+	flog.Infof("getting presigned url")
 	id, _ := strconv.Atoi(
 		mux.Vars(r)["id"],
 	)
 	url, err := audioService.GetPresignedUrl(id)
 	if err != nil {
-		panic(err)
+		flog.Errorf(err.Error())
 	}
 	w.Write([]byte(url))
 }
 
 // GetAudio gets the bytes of an entire object in s3
 func GetAudio(w http.ResponseWriter, r *http.Request) {
-	println("downloading via proxy")
+	flog.Infof("downloading via proxy")
 	id, _ := strconv.Atoi(
 		mux.Vars(r)["id"],
 	)
 	body, length, err := audioService.GetAudio(id)
 	if err != nil {
-		panic(err)
+		flog.Errorf(err.Error())
 	}
 	w.Header().Add("Content-Type", "audio/mp3")
 	// NOTE: when you don't attach a content-length header, the server uses transfer-encoding chunked, which is a form of streaming
@@ -57,7 +59,7 @@ func GetAudio(w http.ResponseWriter, r *http.Request) {
 // and will be specified by the 'Content-Range' headerof the
 // response, in the format od "bytes 0-10000/293872"
 func GetAudioPart(w http.ResponseWriter, r *http.Request) {
-	println("streaming via proxy")
+	flog.Infof("streaming via proxy")
 	id, _ := strconv.Atoi(
 		mux.Vars(r)["id"],
 	)
@@ -70,16 +72,16 @@ func GetAudioPart(w http.ResponseWriter, r *http.Request) {
 		rangeStr := r.Header["Range"][0]
 		_, err := fmt.Sscanf(rangeStr, "bytes=%d-%d", &start, &end)
 		if err != nil {
-			panic(err)
+			flog.Errorf(err.Error())
 		}
 	}
 	// TODO: ensure end not gt file size
 	body, length, fileSize, err := audioService.StreamAudioSegment(id, &start, &end)
 	if err != nil {
-		panic(err)
+		flog.Errorf(err.Error())
 	}
-	fmt.Printf("ContentLength %d\n", *length)
-	fmt.Printf("FileSize %d\n", *fileSize)
+	flog.Infof("ContentLength %d", *length)
+	flog.Infof("FileSize %d", *fileSize)
 	w.Header().Add("Content-Type", "audio/mp3")
 	w.Header().Add("Content-Length", fmt.Sprintf("%d", *length))
 	w.Header().Set(
@@ -104,14 +106,13 @@ func UploadMusicThroughPresigned(w http.ResponseWriter, r *http.Request) {
 	body := r.Body
 	b, err := io.ReadAll(body)
 	if err != nil {
-		panic(err)
+		flog.Errorf(err.Error())
 	}
 	defer body.Close()
 	err = json.Unmarshal(b, &input)
 	if err != nil {
-		panic(err)
+		flog.Errorf(err.Error())
 	}
-	fmt.Println(input)
 	url := audioService.UploadMusicThroughPresigned(input.Key_name, input.File_size)
 	w.Write([]byte(url))
 }

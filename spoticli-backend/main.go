@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
+	"github.com/coder/flog"
 	"net/http"
 	"time"
 
@@ -25,7 +25,7 @@ func main() {
 	defer database.CloseDB()
 
 	http.Handle("/", r)
-	fmt.Println("Listening on localhost:4200")
+	flog.Infof("Listening on localhost:4200")
 
 	// adding cors for null origin testing
 	c := cors.New(cors.Options{
@@ -37,7 +37,7 @@ func main() {
 	printEndpoints(r)
 	err := http.ListenAndServe(":4200", handler)
 	if err != nil {
-		panic(err)
+		flog.Errorf(err.Error())
 	}
 }
 func HealthHandler(w http.ResponseWriter, r *http.Request) {
@@ -49,7 +49,7 @@ func HealthHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	b, err := json.Marshal(hc)
 	if err != nil {
-		panic(err)
+		flog.Errorf(err.Error())
 	}
 	w.Write(b)
 }
@@ -64,7 +64,7 @@ func printEndpoints(r *mux.Router) {
 		if err != nil {
 			return nil
 		}
-		fmt.Printf("%v %s\n", methods, path)
+		flog.Infof("%v %s", methods, path)
 		return nil
 	})
 }

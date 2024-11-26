@@ -2,7 +2,7 @@
 package services
 
 import (
-	"fmt"
+	"github.com/coder/flog"
 
 	"github.com/matttm/spoticli/spoticli-backend/internal/utilities"
 )
@@ -38,12 +38,11 @@ func getSegmentFromCache(key string, reqStart, reqEnd *int64) []byte {
 			// TODO: DOCUMENT SIDE EFFECT
 			*reqStart = sum - c
 			*reqEnd = sum
-			fmt.Printf("Sending frame %d\n", i)
+			flog.Infof("Sending frame %d", i)
 			return v
 		}
 	}
-	fmt.Printf("Unable to get cache store for key %s with start %d of %d b", key, *reqStart, sum)
-	panic("")
+	flog.Errorf("Unable to get cache store for key %s with start %d of %d b", key, *reqStart, sum)
 	return nil
 }
 func filesize(key string) int64 {
@@ -57,9 +56,9 @@ func filesize(key string) int64 {
 }
 
 func cacheItem(key string, frames [][]byte, reqStart, reqEnd int64, reqFrames chan []byte) error {
-	fmt.Printf("Caching...\n")
+	flog.Infof("Caching...")
 	if isItemCached(key) {
-		panic("Item is already cached")
+		flog.Errorf("Item is already cached")
 	}
 	cs := getCacheService()
 	frameClusterSize := cs.configService.GetConfigValueInt64("FRAME_CLUSTER_SIZE")
@@ -69,7 +68,7 @@ func cacheItem(key string, frames [][]byte, reqStart, reqEnd int64, reqFrames ch
 	n := int64(len(frames))
 	var songSegments [][]byte
 	for startFrame < n {
-		fmt.Printf("start %d, end %d, cur %d, end %d\n", startFrame, endFrame, curByte, n)
+		flog.Infof("start %d, end %d, cur %d, end %d", startFrame, endFrame, curByte, n)
 		endFrame = min(startFrame+frameClusterSize, n)
 		b := utilities.Flatten(frames[startFrame:endFrame])
 		songSegments = append(songSegments, b)

@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"fmt"
+	"flog"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -71,7 +71,7 @@ func TestAudioController_GetAudio_Success(t *testing.T) {
 	body := string(data)
 	h := w.Header()
 	assert.Equal(t, "audio/mp3", h.Get("Content-Type"), "Expected Content-Type of 'audio/mp3'")
-	assert.Equal(t, fmt.Sprint(length), h.Get("Content-Length"), "Expected Content-Length of bleh")
+	assert.Equal(t, flog.Sprint(length), h.Get("Content-Length"), "Expected Content-Length of bleh")
 	assert.Equal(t, audio, body, "Expected")
 }
 func TestAudioController_GetAudioSegment_Success(t *testing.T) {
@@ -88,7 +88,7 @@ func TestAudioController_GetAudioSegment_Success(t *testing.T) {
 	b := []byte(audio)
 	var start int64 = 0
 	var end int64 = 0
-	_range := fmt.Sprintf("bytes=%d-%d", start, end)
+	_range := flog.Sprintf("bytes=%d-%d", start, end)
 	part := b[:1]
 	length := len(part)
 	req := httptest.NewRequest(http.MethodGet, "/audio/proxy/stream/1", nil)
@@ -110,6 +110,6 @@ func TestAudioController_GetAudioSegment_Success(t *testing.T) {
 	data, _ := io.ReadAll(w.Body)
 	h := w.Header()
 	assert.Equal(t, "audio/mp3", h.Get("Content-Type"), "Expected Content-Type of 'audio/mp3'")
-	assert.Equal(t, fmt.Sprint(length), h.Get("Content-Length"), "Expected Content-Length of bleh")
+	assert.Equal(t, flog.Sprint(length), h.Get("Content-Length"), "Expected Content-Length of bleh")
 	assert.Equal(t, string(data), "S", "Expected []byte with content x: got y")
 }

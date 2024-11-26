@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"fmt"
 
+	"github.com/coder/flog"
+
 	"github.com/matttm/spoticli/spoticli-backend/internal/constants"
 )
 
@@ -17,9 +19,9 @@ func ReadID3v2Header(b []byte) []byte {
 	}
 	major := int(b[3])
 	revision := int(b[4])
-	fmt.Printf("Major Version %d \nRevision %d\n", major, revision)
+	flog.Infof("Major Version %d Revision %d", major, revision)
 	flags := b[5]
-	fmt.Printf("flags byte %08b\n", flags)
+	flog.Infof("flags byte %08b", flags)
 	// nhe following size bytes are sync safe so 7-bits
 	s1 := int(b[6])
 	s2 := int(b[7])
@@ -27,37 +29,34 @@ func ReadID3v2Header(b []byte) []byte {
 	s4 := int(b[9])
 
 	size := (s1 << (7 * 3)) + (s2 << (7 * 2)) + (s3 << 7) + s4 + 10
-	fmt.Printf("ID3v2 tag size is %d bytes\n", size)
+	flog.Infof("ID3v2 tag size is %d bytes", size)
 	return b[size:]
 }
 
 func getCurrentFrameLength(b []byte) int {
 	frameHeader := b[:4]
-	fmt.Printf("%x \n", frameHeader)
+	flog.Infof("%x ", frameHeader)
 	// first 11 bits are sync word, so skip them
 	mpegVersion := ((frameHeader[1] >> 4) & 0b11)
-	fmt.Printf("MPEG Version %02b\n", mpegVersion)
+	flog.Infof("MPEG Version %02b", mpegVersion)
 	layerDesc := (frameHeader[1] >> 1) & 0b11 // getting bits 5 and 6 as xx
-	fmt.Printf("MPEG Layer %02b\n", layerDesc)
+	flog.Infof("MPEG Layer %02b", layerDesc)
 
 	versionStr := constants.VersionMap[int(mpegVersion)]
 	layerStr := constants.LayerMap[int(layerDesc)]
 	versionLayerStr := fmt.Sprintf("%s,%s", versionStr, layerStr)
-	fmt.Printf("versionLayerString %s\n", versionLayerStr)
+	flog.Infof("versionLayerString %s", versionLayerStr)
 
 	bitRateIndex := (frameHeader[2] >> 4) & 0b1111
 	bitRate := constants.BitrateMap[bitRateIndex][versionLayerStr]
-	if _, err := fmt.Printf("BitRateIndex %04b bitRate %d \n", bitRateIndex, bitRate); err != nil {
-		panic(err)
-	}
 
+	flog.Infof("BitRateIndex %04b bitRate %d ", bitRateIndex, bitRate)
 	samplingRateIndex := (frameHeader[2] >> 2) & 0b11
 	samplingRate := constants.SamplingRateMap[samplingRateIndex][versionStr]
-	if _, err := fmt.Printf("Sampling Rate Index %02b sampling rate %d \n", samplingRateIndex, samplingRate); err != nil {
-		panic(err)
-	}
+
+	flog.Infof("Sampling Rate Index %02b sampling rate %d ", samplingRateIndex, samplingRate)
 	padding := (frameHeader[2] >> 1) & 0b1
-	fmt.Printf("padding bit %08b \n", frameHeader[2])
+	flog.Infof("padding bit %08b ", frameHeader[2])
 	// For Layer I files us this formula:
 	//
 	//	FrameLengthInBytes = (12 * BitRate / SampleRate + Padding) * 4
@@ -65,10 +64,6 @@ func getCurrentFrameLength(b []byte) int {
 	// For Layer II & III files use this formula:
 	//
 	//	FrameLengthInBytes = 144 * BitRate / SampleRate + Padding
-	//  err := os.Stdout.Sync()
-	//  if err != nil {
-	//  	panic(err)
-	//  } // Force flush the output buffer
 	if layerDesc == 0b11 { // it is L1
 		return (12*bitRate*1000/samplingRate + int(padding)) * 4
 	} else {

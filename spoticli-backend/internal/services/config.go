@@ -4,6 +4,7 @@ package services
 
 import (
 	"context"
+	"github.com/coder/flog"
 	"os"
 	"strconv"
 
@@ -32,7 +33,7 @@ func GetConfigService() *ConfigService {
 		configService.Config = map[string]string{}
 		configService.Config["STREAM_SEGMENT_SIZE"] = os.Getenv("STREAM_SEGMENT_SIZE")
 		configService.Config["FRAME_CLUSTER_SIZE"] = os.Getenv("FRAME_CLUSTER_SIZE")
-		println("ConfigService Instantiated")
+		flog.Infof("ConfigService Instantiated")
 	}
 	return configService
 }

@@ -1,8 +1,6 @@
 package services
 
-import (
-	"fmt"
-)
+import "github.com/coder/flog"
 
 type MediaService struct {
 }
@@ -32,7 +30,7 @@ func PartitionMp3Frames(b []byte) [][]byte {
 		if currentFrameLength <= 0 {
 			break
 		}
-		fmt.Printf("Frame count %d frame length %d \n\n", len(frames), currentFrameLength)
+		flog.Infof("Frame count %d frame length %d ", len(frames), currentFrameLength)
 	}
 	return frames
 }

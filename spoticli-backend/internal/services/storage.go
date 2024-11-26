@@ -2,13 +2,13 @@ package services
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"sync"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/coder/flog"
 )
 
 // A StorageService interacts directly with s3
@@ -32,7 +32,7 @@ func GetStorageService() *StorageService {
 			storageService = &StorageService{}
 			storageService.client = s3.NewFromConfig(GetConfigService().CloudConfig)
 			storageService.psClient = s3.NewPresignClient(storageService.client)
-			println("StorageService Instantiated")
+			flog.Infof("StorageService Instantiated")
 		}
 	}
 	return storageService
@@ -67,7 +67,7 @@ func (s *StorageService) GetPresignedUrl(key string) (string, error) {
 		},
 	)
 	if err != nil {
-		panic(err)
+		flog.Errorf(err.Error())
 	}
 	return res.URL, nil
 }
@@ -88,7 +88,7 @@ func (s *StorageService) DownloadFile(key string, _range *string) ([]byte, error
 	defer res.Body.Close()
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		panic(err)
+		flog.Errorf(err.Error())
 	}
 	body = ReadID3v2Header(body)
 	return body, nil
@@ -108,13 +108,13 @@ func (s *StorageService) StreamFile(key string, start, end *int64) ([]byte, int6
 		body, err := io.ReadAll(res.Body)
 		defer res.Body.Close()
 		if err != nil {
-			panic(err)
+			flog.Errorf(err.Error())
 		}
 		// the following  blobk is in testing TODO: subtract id3 sz from filesz
 		body = ReadID3v2Header(body)
 		framesBytes := len(body)
 		frames := PartitionMp3Frames(body)
-		fmt.Printf("Frame count: %d\n", len(frames))
+		flog.Infof("Frame count: %d", len(frames))
 		// end test NOTE:
 		// TODO : put in a goroutine
 		cacheItem(key, frames, *start, *end, requestedFrames)
