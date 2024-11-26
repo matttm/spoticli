@@ -33,9 +33,20 @@ func ReadID3v2Header(b []byte) []byte {
 	return b[size:]
 }
 
+// getCurrentFrameLength
+//
+//	in:
+//	  b []byte - the entire frame with header and ID3v2 stripped off
+//	out:
+//	  x int - the frames length in bytes, or -1 iff frame is invalid
 func getCurrentFrameLength(b []byte) int {
 	frameHeader := b[:4]
 	flog.Infof("%x ", frameHeader)
+	// check for sync frame (eleven sequential ones)
+	if !(frameHeader[0] == 0xFF && frameHeader[1]>>5 == 0b111) {
+		flog.Fatalf("Loaded frame has improper sync header")
+		return -1
+	}
 	// first 11 bits are sync word, so skip them
 	mpegVersion := ((frameHeader[1] >> 4) & 0b11)
 	flog.Infof("MPEG Version %02b", mpegVersion)
@@ -56,7 +67,7 @@ func getCurrentFrameLength(b []byte) int {
 
 	flog.Infof("Sampling Rate Index %02b sampling rate %d ", samplingRateIndex, samplingRate)
 	padding := (frameHeader[2] >> 1) & 0b1
-	flog.Infof("padding bit %08b ", frameHeader[2])
+	flog.Infof("padding bit %02b ", padding)
 	// For Layer I files us this formula:
 	//
 	//	FrameLengthInBytes = (12 * BitRate / SampleRate + Padding) * 4
