@@ -42,9 +42,20 @@ func ReadID3v2Header(b []byte) []byte {
 func getCurrentFrameLength(b []byte) int {
 	frameHeader := b[:4]
 	flog.Infof("%x ", frameHeader)
+	// check if this an ID3v1 tag
+	if string(frameHeader[:3]) == "TAG" {
+		flog.Successf("Identified ID3v1 tag")
+		title := b[3:33]
+		artist := b[33:63]
+		album := b[63:93]
+		flog.Successf("Song title: %s", string(title))
+		flog.Successf("Artist: %s", string(artist))
+		flog.Successf("Album: %s", string(album))
+		return 0
+	}
 	// check for sync frame (eleven sequential ones)
 	if !(frameHeader[0] == 0xFF && frameHeader[1]>>5 == 0b111) {
-		flog.Fatalf("Loaded frame has improper sync header")
+		flog.Errorf("Loaded frame has improper sync header")
 		return -1
 	}
 	// first 11 bits are sync word, so skip them
@@ -67,7 +78,7 @@ func getCurrentFrameLength(b []byte) int {
 
 	flog.Infof("Sampling Rate Index %02b sampling rate %d ", samplingRateIndex, samplingRate)
 	padding := (frameHeader[2] >> 1) & 0b1
-	flog.Infof("padding bit %02b ", padding)
+	flog.Infof("padding bit %01b ", padding)
 	// For Layer I files us this formula:
 	//
 	//	FrameLengthInBytes = (12 * BitRate / SampleRate + Padding) * 4

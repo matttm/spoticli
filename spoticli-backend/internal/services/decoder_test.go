@@ -37,7 +37,12 @@ func TestDecoderService_DetermineFrameLength(t *testing.T) {
 		{
 			purpose:  "should decode frame header",
 			frame:    []byte{0xff, 0xfb, 0xb2, 0x60},
-			expected: 0,
+			expected: 627,
+		},
+		{
+			purpose:  "should decode an ID3v1 tag",
+			frame:    []byte{0x54, 0x41, 0x47, 0x54, 0x68},
+			expected: 627,
 		},
 	}
 	for _, v := range table {
