@@ -52,7 +52,6 @@ func StreamAudioSegment(id int, start, end *int64) ([]byte, *int, *int64, error)
 	}
 	key := t.Key_name
 	svc := GetStorageService()
-	// TODO: rewrite and use getaudiopart
 	segment, filesize, err := svc.StreamFile(key, start, end)
 	if err != nil {
 		return nil, nil, nil, err

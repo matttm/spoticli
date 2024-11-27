@@ -110,7 +110,6 @@ func (s *StorageService) StreamFile(key string, start, end *int64) ([]byte, int6
 		if err != nil {
 			flog.Errorf(err.Error())
 		}
-		// the following  blobk is in testing TODO: subtract id3 sz from filesz
 		body = ReadID3v2Header(body)
 		framesBytes := len(body)
 		frames := PartitionMp3Frames(body)

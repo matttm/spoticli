@@ -68,7 +68,7 @@ func cacheItem(key string, frames [][]byte, reqStart, reqEnd int64, reqFrames ch
 	n := int64(len(frames))
 	var songSegments [][]byte
 	for startFrame < n {
-		flog.Infof("start %d, end %d, cur %d, end %d", startFrame, endFrame, curByte, n)
+		flog.Infof("Caching the frame range %d-%d with accruing byte count %d", startFrame, endFrame, curByte)
 		endFrame = min(startFrame+frameClusterSize, n)
 		b := utilities.Flatten(frames[startFrame:endFrame])
 		songSegments = append(songSegments, b)
