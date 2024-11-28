@@ -6,10 +6,13 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.32.0
 	github.com/aws/aws-sdk-go-v2/config v1.27.41
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.65.0
+	github.com/coder/flog v1.1.0
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/gorilla/mux v1.8.1
 	github.com/matttm/spoticli/spoticli-models v0.0.0
 	github.com/rs/cors v1.11.1
+	github.com/stretchr/testify v1.9.0
+	go.uber.org/mock v0.5.0
 )
 
 require (
@@ -30,9 +33,11 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sts v1.32.0 // indirect
 	github.com/aws/smithy-go v1.22.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/fatih/color v1.13.0 // indirect
+	github.com/mattn/go-colorable v0.1.12 // indirect
+	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/stretchr/testify v1.9.0 // indirect
-	go.uber.org/mock v0.5.0 // indirect
+	golang.org/x/sys v0.25.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 

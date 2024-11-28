@@ -4,6 +4,8 @@ package services
 import (
 	"fmt"
 
+	"github.com/coder/flog"
+
 	"github.com/matttm/spoticli/spoticli-backend/internal/database"
 )
 
@@ -15,7 +17,7 @@ func GetPresignedUrl(id int) (string, error) {
 	svc := GetStorageService()
 	url, err := svc.GetPresignedUrl(key)
 	if err != nil {
-		panic(err)
+		flog.Errorf(err.Error())
 	}
 	return url, nil
 }
@@ -46,11 +48,10 @@ func StreamAudioSegment(id int, start, end *int64) ([]byte, *int, *int64, error)
 	}
 	if *start >= int64(t.File_size) {
 		err := fmt.Errorf("Invalid start pos: %d >= %d", *start, t.File_size)
-		panic(err)
+		flog.Errorf(err.Error())
 	}
 	key := t.Key_name
 	svc := GetStorageService()
-	// TODO: rewrite and use getaudiopart
 	segment, filesize, err := svc.StreamFile(key, start, end)
 	if err != nil {
 		return nil, nil, nil, err
@@ -66,7 +67,7 @@ func UploadMusicThroughPresigned(track_name string, file_size int) string {
 	url, err := svc.PostPresignedUrl(track_name)
 	if err != nil {
 		tx.Rollback()
-		panic(err)
+		flog.Errorf(err.Error())
 	}
 	// TODO: delegate tx finalizatipn to bg task to check for upload
 	_ = tx.Commit()

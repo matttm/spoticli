@@ -6,6 +6,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/coder/flog"
+
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -29,7 +31,7 @@ func InitializeDatabase() {
 	db.SetMaxOpenConns(10)
 	db.SetMaxIdleConns(10)
 
-	fmt.Println("Database was successfully connected to")
+	flog.Successf("Database was successfully connected to")
 
 	DB = db
 }
@@ -40,7 +42,7 @@ func CloseDB() error {
 
 func GetDatabase() *sql.DB {
 	if DB == nil {
-		panic("Error: database not initialized")
+		flog.Fatalf("Error: database not initialized")
 	}
 	return DB
 }
