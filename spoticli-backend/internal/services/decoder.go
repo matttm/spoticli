@@ -56,6 +56,7 @@ func getCurrentFrameLength(b []byte) int {
 	// check for sync frame (eleven sequential ones)
 	if !(frameHeader[0] == 0xFF && frameHeader[1]>>5 == 0b111) {
 		flog.Errorf("Loaded frame has improper sync header")
+		panic("")
 		return -1
 	}
 	// first 11 bits are sync word, so skip them
