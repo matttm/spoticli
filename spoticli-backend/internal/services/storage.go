@@ -90,7 +90,7 @@ func (s *StorageService) DownloadFile(key string, _range *string) ([]byte, error
 	if err != nil {
 		flog.Errorf(err.Error())
 	}
-	body = ReadID3v2Header(body)
+	// body = ReadID3v2Header(body)
 	return body, nil
 }
 
