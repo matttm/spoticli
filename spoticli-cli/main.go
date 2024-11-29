@@ -51,25 +51,27 @@ func main() {
 						},
 					},
 					{
-						Name:  "play",
-						Usage: "play",
+						Name:        "play",
+						Usage:       "play",
+						Description: "Prompts for a song choice and streams it",
 						Action: func(cCtx *cli.Context) error {
 							handler.StreamSong()
 							return nil
 						},
 					},
 					{
-						Name:  "download",
-						Usage: "download <song-id>",
+						Name:        "download",
+						Usage:       "download>",
+						Description: "Prompts for a song and downloads it",
 						Action: func(cCtx *cli.Context) error {
-							id := cCtx.Args().Get(0)
-							handler.DownloadSong(id)
+							handler.DownloadSong()
 							return nil
 						},
 					},
 					{
-						Name:  "ls",
-						Usage: "ls",
+						Name:        "ls",
+						Usage:       "ls",
+						Description: "Lists songs available to download/atream",
 						Action: func(cCtx *cli.Context) error {
 							cd := 1 //   cCtx.Args().Get(0)
 							handler.ListFiles(cd)

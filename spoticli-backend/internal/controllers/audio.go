@@ -38,13 +38,15 @@ func GetAudio(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(
 		mux.Vars(r)["id"],
 	)
-	body, length, err := audioService.GetAudio(id)
+	body, length_64bit, err := audioService.GetAudio(id)
 	if err != nil {
 		flog.Errorf(err.Error())
 	}
+	length := strconv.FormatInt(*length_64bit, 10)
 	w.Header().Add("Content-Type", "audio/mp3")
 	// NOTE: when you don't attach a content-length header, the server uses transfer-encoding chunked, which is a form of streaming
-	w.Header().Add("Content-Length", strconv.FormatInt(*length, 10))
+	w.Header().Add("Content-Length", length)
+	w.Header().Add("Content-Range", fmt.Sprintf("bytes 0-%s/%s", length, length))
 	w.Write(body)
 }
 

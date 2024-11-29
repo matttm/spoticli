@@ -15,7 +15,10 @@ import (
 	"github.com/matttm/spoticli/spoticli-cli/internal/utilities"
 )
 
-func DownloadSong(id string) error {
+func DownloadSong() error {
+	_id, _ := promptSongs()
+	id := strconv.Itoa(_id)
+	fmt.Println(id)
 	seg := models.AudioSegment{StartByte: 0, EndByte: 0, SegmentLength: 0}
 	b, _ := utilities.GetBytesBackend(
 		nil,
