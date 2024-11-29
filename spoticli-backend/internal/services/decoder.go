@@ -42,6 +42,11 @@ func ReadID3v2Header(b []byte) []byte {
 func getCurrentFrameLength(b []byte) int {
 	frameHeader := b[:4]
 	flog.Infof("%x ", frameHeader)
+	// if following is 0, it must be padding
+	if frameHeader[0]|frameHeader[1]|frameHeader[2]|frameHeader[3] == 0 {
+		// if theres padding between last frame and ID3v2 tag, just end partitioning
+		return 0
+	}
 	// check if this an ID3v1 tag
 	if string(frameHeader[:3]) == "TAG" {
 		flog.Successf("Identified ID3v1 tag")
@@ -56,7 +61,6 @@ func getCurrentFrameLength(b []byte) int {
 	// check for sync frame (eleven sequential ones)
 	if !(frameHeader[0] == 0xFF && frameHeader[1]>>5 == 0b111) {
 		flog.Errorf("Loaded frame has improper sync header")
-		panic("")
 		return -1
 	}
 	// first 11 bits are sync word, so skip them
