@@ -44,7 +44,7 @@ Also a feature of this backend is when doing a range request, only the start pos
 
 [MP3 frame anatomy](http://www.mp3-tech.org/programmer/frame_header.html)
 
-[MP3 Decoder](chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/https://www.diva-portal.org/smash/get/diva2:830195/FULLTEXT01.pdf)
+[MP3 Decoder](https://www.diva-portal.org/smash/get/diva2:830195/FULLTEXT01.pdf)
 
 ## Getting started
 
