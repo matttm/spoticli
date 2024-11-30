@@ -6,7 +6,7 @@ Development: Active
 
 A program to stream music from the command line. This program can stream or download mp3 files from aws s3 to a command-line user. Downloading can be done directly (presigned url) or via the backend serving the content. Streaming  cannot be done using presigned urls as some backend processing is required.
 
-This backend processing includes removing the ID3v2 header from the beginning of the mp3 file, and then partitioning it into clusters of mp3 frames, to ensure every payload sent to the frontend contains the mp3 header.
+Streaming is made possible due to the Decoder service. It decodes whats needed to comput the sizes of frames and tags and metadata.
 
 See the README in [spoticli-backend](https://github.com/matttm/spoticli/tree/main/spoticli-backend#spoticli-backend) for more on the algorithm and backend architecture.
 

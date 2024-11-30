@@ -35,6 +35,11 @@ func TestDecoderService_DetermineFrameLength(t *testing.T) {
 			expected: -1,
 		},
 		{
+			purpose:  "should not decode frame header when missing sync header",
+			frame:    []byte{0xff, 0xfb, 0x92, 0x0c},
+			expected: 418,
+		},
+		{
 			purpose:  "should decode frame header",
 			frame:    []byte{0xff, 0xfb, 0xb2, 0x60},
 			expected: 627,

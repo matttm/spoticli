@@ -110,7 +110,6 @@ func UploadFileViaPresign(filepath string, filesize int64, wg *sync.WaitGroup) {
 	fmt.Printf("Spawning thread to handle upload for %s\n", filepath)
 	segs := strings.Split(filepath, "/")
 	filename := segs[len(segs)-1]
-	// TODO: move filename from url to body
 	var meta ext_models.FileMetaInfo
 	meta.Key_name = filename
 	meta.File_size = int(filesize)
