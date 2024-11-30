@@ -56,7 +56,7 @@ export FRAME_CLUSTER_SIZE=30
 
 # database
 export DB_HOST="localhost"
-export DB_PORT=""3306
+export DB_PORT="3306"
 export DB_USERNAME="ADMIN"
 export DB_PASSWORD="ADMIN"
 
@@ -68,7 +68,13 @@ export AWS_REGION=us-east-1
 
 ```
 
-Once these are in your enironment, you can run the backend in the terminal as follows
+Once these are in your enironment, you must build the docker image and run a container.
+```
+❯ docker build -t spoticli-db-img .                                                                                                                              ─╯
+❯ docker run -d -p 3306:3306 --name spoticli-db spoticli-db-img                                                                                                  ─╯
+```
+
+Then you can run the backend in the terminal as follows
 ```
 $ go build
 $ ./spoticli-backend
