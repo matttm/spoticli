@@ -64,8 +64,6 @@ export DB_PASSWORD="ADMIN"
 export AWS_ACCESS_KEY_ID="key"
 export AWS_SECRET_ACCESS_KEY="secret"
 export AWS_REGION=us-east-1
-
-
 ```
 
 Once these are in your enironment, you must build the docker image and run a container.
@@ -79,4 +77,3 @@ Then you can run the backend in the terminal as follows
 $ go build
 $ ./spoticli-backend
 ```
-## Architecture
