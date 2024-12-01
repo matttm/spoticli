@@ -49,3 +49,8 @@ OPTIONS:
    --help, -h  show help
 
 ```
+There is also the `./spoticli-cli song upload <path>` which will upload a directory to s3 and create db entries for each song in the database. For now the path shold be from the user's directory. So if you want to upload `~/assets/a7x`. Run the following:
+./spoticli-cli song upload assets/a7x
+```
+```
+
