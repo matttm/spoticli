@@ -77,3 +77,7 @@ Then you can run the backend in the terminal as follows
 $ go build
 $ ./spoticli-backend
 ```
+
+## Database Architecture
+<img width="400" src="https://github.com/matttm/spoticli/blob/main/assets/db-arch.png"/>
+<img width="400" src="https://github.com/matttm/spoticli/blob/main/assets/db-table.png"/>
