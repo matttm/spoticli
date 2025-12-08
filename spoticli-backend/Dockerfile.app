@@ -1,5 +1,5 @@
 # Multi-stage build for Go application
-FROM golang:1.21-alpine AS builder
+FROM golang:1.23-alpine AS builder
 
 # Install build dependencies
 RUN apk add --no-cache git ca-certificates tzdata
@@ -7,14 +7,19 @@ RUN apk add --no-cache git ca-certificates tzdata
 # Set working directory
 WORKDIR /app
 
+# Copy the spoticli-models dependency (for local replace directive)
+COPY spoticli-models /spoticli-models
+
 # Copy go mod files
-COPY go.mod go.sum ./
+COPY spoticli-backend/go.mod spoticli-backend/go.sum ./
+
+RUN   ls -al
 
 # Download dependencies
 RUN go mod download
 
 # Copy source code
-COPY . .
+COPY spoticli-backend/ .
 
 # Build the application
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o spoticli-backend .

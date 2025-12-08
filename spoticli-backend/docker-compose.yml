@@ -1,8 +1,8 @@
 services:
   app:
     build:
-      context: .
-      dockerfile: Dockerfile.app
+      context: ..
+      dockerfile: spoticli-backend/Dockerfile.app
     container_name: spoticli-app
     environment:
       STREAM_SEGMENT_SIZE: "1000000"
