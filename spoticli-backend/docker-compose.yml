@@ -30,9 +30,15 @@ services:
       MYSQL_PASSWORD: ADMIN
     ports:
       - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD}"]
       interval: 10s
       retries: 10
       start_period: 20s
       timeout: 5s
+
+volumes:
+  db-data:
