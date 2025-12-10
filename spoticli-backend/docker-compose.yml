@@ -40,5 +40,31 @@ services:
       start_period: 20s
       timeout: 5s
 
+  localstack:
+    image: localstack/localstack:latest
+    ports:
+      # S3 uses port 4566 by default in LocalStack
+      - "4566:4566"
+      - "4510-4559:4510-4559" # required for newer versions
+      - "8055:8055" # LocalStack web user interface
+    environment:
+      # Specifies which services to run
+      SERVICES: s3
+      # Optional: Sets a fixed access key and secret key for local use
+      AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID:-}"
+      AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY:-}"
+      AWS_REGION: "${AWS_REGION:-us-east-1}"
+      # Recommended for compatibility with older tools
+      LOCALSTACK_ARCH: native
+      # Enables a user interface to view resources
+      USE_SSL: "true"
+      EDGE_PORT: 4566
+    volumes:
+      # Persists data across container restarts
+      - localstack_data:/var/lib/localstack
+      # Initialization hooks (optional): mount a directory with scripts to run on startup
+      # - ./aws-init:/etc/localstack/init/ready.d/
+    restart: always
 volumes:
   db-data:
+  localstack_data:
