@@ -62,6 +62,7 @@ services:
     volumes:
       # Persists data across container restarts
       - localstack_data:/var/lib/localstack
+      - "./init_s3.py:/etc/localstack/init/ready.d/init-s3.py"  # ready hook
       # Initialization hooks (optional): mount a directory with scripts to run on startup
       # - ./aws-init:/etc/localstack/init/ready.d/
     restart: always

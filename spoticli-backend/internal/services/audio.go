@@ -47,7 +47,7 @@ func StreamAudioSegment(id int, start, end *int64) ([]byte, *int, *int64, error)
 		*end = GetConfigService().GetConfigValueInt64("STREAM_SEGMENT_SIZE")
 	}
 	if *start >= int64(t.File_size) {
-		err := fmt.Errorf("Invalid start pos: %d >= %d", *start, t.File_size)
+		err := fmt.Errorf("invalid start pos: %d >= %d", *start, t.File_size)
 		flog.Errorf(err.Error())
 	}
 	key := t.Key_name
@@ -62,7 +62,10 @@ func StreamAudioSegment(id int, start, end *int64) ([]byte, *int, *int64, error)
 func UploadMusicThroughPresigned(track_name string, file_size int) string {
 	db := database.GetDatabase()
 	svc := GetStorageService()
-	tx, _ := db.Begin()
+	tx, err := db.Begin()
+	if err != nil {
+		flog.Errorf(err.Error())
+	}
 	database.InsertFileMetaInfo(tx, track_name, *TRACKS_BUCKET_NAME, 1, file_size)
 	url, err := svc.PostPresignedUrl(track_name)
 	if err != nil {
@@ -70,6 +73,9 @@ func UploadMusicThroughPresigned(track_name string, file_size int) string {
 		flog.Errorf(err.Error())
 	}
 	// TODO: delegate tx finalizatipn to bg task to check for upload
-	_ = tx.Commit()
+	err = tx.Commit()
+	if err != nil {
+		flog.Errorf(err.Error())
+	}
 	return *url
 }
