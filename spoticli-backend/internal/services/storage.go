@@ -43,6 +43,7 @@ func (s *StorageService) PostPresignedUrl(key string) (*string, error) {
 		Bucket: TRACKS_BUCKET_NAME,
 		//  ContentType: MIME_MP3,
 		Key: aws.String(key),
+		ContentType: aws.String("audio/mp3"),
 	}
 	req, err := s.psClient.PresignPutObject(
 		context.TODO(),

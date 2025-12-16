@@ -115,5 +115,6 @@ func UploadMusicThroughPresigned(w http.ResponseWriter, r *http.Request) {
 		flog.Errorf(err.Error())
 	}
 	url := audioService.UploadMusicThroughPresigned(input.Key_name, input.File_size)
+	w.Header().Set("Content-Type", "text/plain")
 	w.Write([]byte(url))
 }
