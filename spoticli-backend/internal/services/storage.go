@@ -30,7 +30,11 @@ func GetStorageService() *StorageService {
 		defer storageLock.Unlock()
 		if storageService == nil {
 			storageService = &StorageService{}
-			storageService.client = s3.NewFromConfig(GetConfigService().CloudConfig)
+			cfg := GetConfigService().CloudConfig
+			// Use path-style addressing for LocalStack compatibility
+			storageService.client = s3.NewFromConfig(cfg, func(o *s3.Options) {
+				o.UsePathStyle = true
+			})
 			storageService.psClient = s3.NewPresignClient(storageService.client)
 			flog.Infof("StorageService Instantiated")
 		}
@@ -42,7 +46,7 @@ func (s *StorageService) PostPresignedUrl(key string) (*string, error) {
 	input := &s3.PutObjectInput{
 		Bucket: TRACKS_BUCKET_NAME,
 		//  ContentType: MIME_MP3,
-		Key: aws.String(key),
+		Key:         aws.String(key),
 		ContentType: aws.String("audio/mp3"),
 	}
 	req, err := s.psClient.PresignPutObject(
