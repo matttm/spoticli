@@ -13,9 +13,9 @@ import (
 
 // A StorageService interacts directly with s3
 type StorageService struct {
-	client *s3.Client
+	client S3ClientApi
 	// for unauthenticated users:
-	psClient *s3.PresignClient
+	psClient S3PresignClientApi
 }
 
 var storageLock = &sync.Mutex{}
@@ -32,12 +32,13 @@ func GetStorageService() *StorageService {
 			storageService = &StorageService{}
 			cfg := GetConfigService().CloudConfig
 			// Use path-style addressing for LocalStack compatibility
-			storageService.client = s3.NewFromConfig(cfg, func(o *s3.Options) {
+			client := s3.NewFromConfig(cfg, func(o *s3.Options) {
 				o.UsePathStyle = true
 			})
+			storageService.client = client
 			flog.Infof("S3 client configured with endpoint: %s", *cfg.BaseEndpoint)
-			storageService.psClient = s3.NewPresignClient(storageService.client)
-			flog.Infof("S3 presign client initialized with endpoint: %s", *storageService.client.Options().BaseEndpoint)
+			storageService.psClient = s3.NewPresignClient(client)
+			flog.Infof("S3 presign client initialized with endpoint: %s", *client.Options().BaseEndpoint)
 			flog.Infof("StorageService Instantiated")
 		}
 	}
