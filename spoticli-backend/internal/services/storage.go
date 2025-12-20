@@ -35,7 +35,9 @@ func GetStorageService() *StorageService {
 			storageService.client = s3.NewFromConfig(cfg, func(o *s3.Options) {
 				o.UsePathStyle = true
 			})
+			flog.Infof("S3 client configured with endpoint: %s", *cfg.BaseEndpoint)
 			storageService.psClient = s3.NewPresignClient(storageService.client)
+			flog.Infof("S3 presign client initialized with endpoint: %s", *storageService.client.Options().BaseEndpoint)
 			flog.Infof("StorageService Instantiated")
 		}
 	}
@@ -90,6 +92,10 @@ func (s *StorageService) DownloadFile(key string, _range *string) ([]byte, error
 		context.TODO(),
 		input,
 	)
+	if err != nil {
+		flog.Errorf(err.Error())
+		return nil, err
+	}
 	defer res.Body.Close()
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
@@ -110,6 +116,9 @@ func (s *StorageService) StreamFile(key string, start, end *int64) ([]byte, int6
 			context.TODO(),
 			input,
 		)
+		if err != nil {
+			flog.Errorf(err.Error())
+		}
 		body, err := io.ReadAll(res.Body)
 		defer res.Body.Close()
 		if err != nil {
