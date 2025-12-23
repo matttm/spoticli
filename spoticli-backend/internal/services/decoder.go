@@ -30,6 +30,9 @@ func ReadID3v2Header(b []byte) []byte {
 
 	size := (s1 << (7 * 3)) + (s2 << (7 * 2)) + (s3 << 7) + s4 + 10
 	flog.Infof("ID3v2 tag size is %d bytes", size)
+	if size > len(b) {
+		flog.Errorf("Declared ID3v2 size %d is larger than available data %d", size, len(b))
+	}
 	return b[size:]
 }
 

@@ -78,14 +78,20 @@ func TestStorageService_DownloadFile_Success(t *testing.T) {
 
 	key := "test-key"
 	// Create a valid ID3v2 header: "ID3" + version + flags + size (sync-safe)
+	audioData := []byte("fake audio data")
+	// Size in sync-safe format: 15 bytes = 0x0F = 0b00001111
+	// Sync-safe means using only 7 bits per byte, so: 0x00 0x00 0x00 0x0F
 	id3Header := []byte{
 		0x49, 0x44, 0x33, // "ID3"
 		0x03, 0x00, // version 2.3.0
 		0x00,                   // flags
-		0x00, 0x00, 0x00, 0x00, // size (sync-safe, 4 bytes)
+		0x00, 0x00, 0x00, 0x0F, // size: 15 bytes (sync-safe)
 	}
-	audioData := []byte("fake audio data")
-	fullData := append(id3Header, audioData...)
+	// ID3 tag content (15 bytes to match the size)
+	id3TagContent := make([]byte, 15)
+	// Actual audio data comes after the ID3 tag
+	fullData := append(id3Header, id3TagContent...)
+	fullData = append(fullData, audioData...)
 	mockBody := io.NopCloser(strings.NewReader(string(fullData)))
 
 	mockClient.EXPECT().
@@ -118,14 +124,19 @@ func TestStorageService_DownloadFile_WithRange_Success(t *testing.T) {
 	key := "test-key"
 	rangeStr := "bytes=0-100"
 	// Create a valid ID3v2 header
+	audioData := []byte("fake audio data")
+	// Size in sync-safe format: 15 bytes = 0x0F
 	id3Header := []byte{
 		0x49, 0x44, 0x33, // "ID3"
 		0x03, 0x00, // version 2.3.0
 		0x00,                   // flags
-		0x00, 0x00, 0x00, 0x00, // size (sync-safe, 4 bytes)
+		0x00, 0x00, 0x00, 0x0F, // size: 15 bytes (sync-safe)
 	}
-	audioData := []byte("fake audio data")
-	fullData := append(id3Header, audioData...)
+	// ID3 tag content (15 bytes to match the size)
+	id3TagContent := make([]byte, 15)
+	// Actual audio data comes after the ID3 tag
+	fullData := append(id3Header, id3TagContent...)
+	fullData = append(fullData, audioData...)
 	mockBody := io.NopCloser(strings.NewReader(string(fullData)))
 
 	mockClient.EXPECT().
