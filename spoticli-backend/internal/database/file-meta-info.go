@@ -34,9 +34,6 @@ func SelectAllFileMetaInfo() []*models.FileMetaInfo {
 func SelectOneFileMetaInfo(id int) *models.FileMetaInfo {
 	query := "SELECT key_name, bucket_name, file_size FROM SPOTICLI_DB.FILE_META_INFO WHERE ID = ?;"
 	row := DB.QueryRow(query, id)
-	if row == nil {
-		panic("")
-	}
 	file := new(models.FileMetaInfo)
 	if err := row.Scan(&file.Key_name, &file.Bucket_name, &file.File_size); err != nil {
 		flog.Errorf(err.Error())

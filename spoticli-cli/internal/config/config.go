@@ -1,4 +1,4 @@
 package config
 
 const SERVER_URL = "localhost:4200"
-const SECONDS_TO_WAIT_PER_FRAMES = 15
+const SECONDS_PER_STREAM_REQUEST = 10

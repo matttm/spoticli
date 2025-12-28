@@ -41,6 +41,7 @@ func GetAudio(id int) ([]byte, *int64, error) {
 // StreamAudioSegment
 func StreamAudioSegment(id int, start, end *int64) ([]byte, *int, *int64, error) {
 	t, _ := GetFileById(id)
+	flog.Infof("File selected for streaming %+v", t)
 	var filesize int64
 	// key := t.Key_name
 	if *start == 0 {

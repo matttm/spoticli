@@ -6,7 +6,7 @@ services:
     container_name: spoticli-app
     environment:
       STREAM_SEGMENT_SIZE: "1000000"
-      FRAME_CLUSTER_SIZE: "30"
+      FRAME_CLUSTER_SIZE: "600"
       DB_HOST: db
       DB_PORT: "3306"
       DB_USERNAME: ADMIN

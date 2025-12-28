@@ -101,8 +101,13 @@ func (s *StorageService) DownloadFile(key string, _range *string) ([]byte, error
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		flog.Errorf(err.Error())
+		return nil, err
 	}
-	body = ReadID3v2Header(body)
+	body, err = ReadID3v2Header(body)
+	if err != nil {
+		flog.Errorf(err.Error())
+		return nil, err
+	}
 	return body, nil
 }
 
@@ -119,13 +124,19 @@ func (s *StorageService) StreamFile(key string, start, end *int64) ([]byte, int6
 		)
 		if err != nil {
 			flog.Errorf(err.Error())
+			return nil, 0, err
 		}
 		body, err := io.ReadAll(res.Body)
 		defer res.Body.Close()
 		if err != nil {
 			flog.Errorf(err.Error())
+			return nil, 0, err
 		}
-		body = ReadID3v2Header(body)
+		body, err = ReadID3v2Header(body)
+		if err != nil {
+			flog.Errorf(err.Error())
+			return nil, 0, err
+		}
 		framesBytes := len(body)
 		frames := PartitionMp3Frames(body)
 		flog.Infof("Frame count: %d", len(frames))

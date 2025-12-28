@@ -19,7 +19,7 @@ func DownloadSong() error {
 	_id, _ := promptSongs()
 	id := strconv.Itoa(_id)
 	fmt.Println(id)
-	seg := models.AudioSegment{StartByte: 0, EndByte: 0, SegmentLength: 0}
+	seg := models.AudioSegment{StartByte: 0, EndByte: 0, TotalBytes: 0}
 	b, _ := utilities.GetBytesBackend(
 		nil,
 		&seg,
@@ -45,27 +45,31 @@ func StreamSong() error {
 	speaker.Play(&queue)
 
 	// creating struct to follow boundaries
-	seg := models.AudioSegment{StartByte: -1, EndByte: -1, SegmentLength: 0}
+	seg := models.AudioSegment{StartByte: -1, EndByte: -1, TotalBytes: 0}
 	var streamer beep.StreamSeekCloser
+	isinitial := true
+	
 	// then perform loop for remainder of song
-	ticker := time.NewTicker(time.Second * config.SECONDS_TO_WAIT_PER_FRAMES)
+	ticker := time.NewTicker(time.Second * config.SECONDS_PER_STREAM_REQUEST)
 	go func() {
 		for ; ; <-ticker.C {
 			streamer, _ = utilities.GetBufferedAudioSegment(id, &seg) // this function call has a side affect on seg
 			// start channel done
-			fmt.Printf("Content-Range: %d-%d, %d\n", seg.StartByte, seg.EndByte, seg.SegmentLength)
+			fmt.Printf("Content-Range: %d-%d, %d\n", seg.StartByte, seg.EndByte, seg.TotalBytes)
 
 			// And finally, we add the song to the queue.
 			speaker.Lock()
 			queue.Add(streamer)
 			speaker.Unlock()
-			if seg.StartByte == 0 {
+			if isinitial {
+				fmt.Println("First segment streamed, starting playback")
 				start <- true
 				close(start)
+				isinitial = false
 			}
 
-			if seg.EndByte == seg.SegmentLength {
-				fmt.Println("Finished streaming song")
+			if seg.EndByte >= seg.TotalBytes {
+				fmt.Println("Final segment streamed, ending playback")
 				// end channel
 				if _, ok := <-start; !ok {
 					queue.Add(beep.Callback(func() {
@@ -77,8 +81,8 @@ func StreamSong() error {
 			}
 			// make seg point to next desired segment
 			delta := seg.EndByte - seg.StartByte
-			seg.StartByte = seg.EndByte + 1
-			seg.EndByte = min(seg.StartByte+delta, seg.SegmentLength+1)
+			seg.StartByte = seg.EndByte+1
+			seg.EndByte = min(seg.StartByte+delta, seg.TotalBytes+1)
 		}
 	}()
 	_ = <-start

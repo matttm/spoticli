@@ -132,11 +132,12 @@ func TestReadID3v2Header(t *testing.T) {
 	for _, v := range table {
 		t.Run(v.purpose, func(t *testing.T) {
 			if v.panics {
-				assert.Panics(t, func() {
-					ReadID3v2Header(v.input)
-				}, v.purpose)
+				result, err := ReadID3v2Header(v.input)
+				assert.Error(t, err, v.purpose)
+				assert.Nil(t, result, v.purpose)
 			} else {
-				result := ReadID3v2Header(v.input)
+				result, err := ReadID3v2Header(v.input)
+				assert.NoError(t, err, v.purpose)
 				assert.Equal(t, v.expected, result, v.purpose)
 			}
 		})

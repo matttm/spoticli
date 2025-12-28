@@ -16,21 +16,22 @@ func GetMusiceService() *MediaService {
 }
 
 // PartitionMp3Frames takes an entire
-// mp3 file andreturns a slice of frames
+// mp3 file and returns a slice of frames
 func PartitionMp3Frames(b []byte) [][]byte {
 	if len(b) == 0 {
 		return [][]byte{}
 	}
+	flog.Infof("Total number of bytes %d", len(b))
 	var frames [][]byte
 	for {
 		currentFrameLength := getCurrentFrameLength(b)
-		clip := b[:currentFrameLength]
-		frames = append(frames, clip)
-		b = b[currentFrameLength:]
 		if currentFrameLength <= 0 {
 			break
 		}
-		flog.Infof("Frame count %d frame length %d ", len(frames), currentFrameLength)
+		frameData := b[:currentFrameLength]
+		frames = append(frames, frameData)
+		b = b[currentFrameLength:]
+		flog.Infof("Frames counted %d remaining byte count %d ", len(frames), len(b))
 	}
 	return frames
 }
