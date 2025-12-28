@@ -1,0 +1,14 @@
+{
+  "workspace": {
+    "id": ""
+  },
+  "entities": {
+    "collections": [
+      "../spoticli-backend.postman_collection.json"
+    ],
+    "environments": [],
+    "specs": [],
+    "flows": [],
+    "globals": []
+  }
+}

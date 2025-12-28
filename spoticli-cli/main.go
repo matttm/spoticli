@@ -43,7 +43,7 @@ func main() {
 					{
 						Name:        "upload",
 						Usage:       "upload <path>",
-						Description: "Uploads a directory of music using a presigned url",
+						Description: "Uploads a directory of music using presigned urls",
 						Action: func(cCtx *cli.Context) error {
 							path := cCtx.Args().Get(0)
 							handler.UploadMusic(path)
@@ -61,7 +61,7 @@ func main() {
 					},
 					{
 						Name:        "download",
-						Usage:       "download>",
+						Usage:       "download",
 						Description: "Prompts for a song and downloads it",
 						Action: func(cCtx *cli.Context) error {
 							handler.DownloadSong()

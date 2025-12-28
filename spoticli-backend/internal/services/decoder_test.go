@@ -59,3 +59,87 @@ func TestDecoderService_DetermineFrameLength(t *testing.T) {
 		)
 	}
 }
+
+type readID3v2HeaderTestCase struct {
+	purpose  string
+	input    []byte
+	expected []byte
+	panics   bool
+}
+
+func TestReadID3v2Header(t *testing.T) {
+	var table = []readID3v2HeaderTestCase{
+		{
+			purpose: "should read ID3v2 header with minimal size",
+			input: []byte{
+				'I', 'D', '3', // ID3 identifier
+				0x03, 0x00, // version 3.0
+				0x00,                   // flags
+				0x00, 0x00, 0x00, 0x00, // size (10 bytes total - just header)
+				'r', 'e', 's', 't', // remaining data
+			},
+			expected: []byte{'r', 'e', 's', 't'},
+			panics:   false,
+		},
+		{
+			purpose: "should read ID3v2 header with size calculation",
+			input: []byte{
+				'I', 'D', '3', // ID3 identifier
+				0x04, 0x00, // version 4.0
+				0x00,                   // flags
+				0x00, 0x00, 0x00, 0x0A, // size (10 + 10 = 20 bytes)
+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // padding
+				'd', 'a', 't', 'a', // remaining data
+			},
+			expected: []byte{'d', 'a', 't', 'a'},
+			panics:   false,
+		},
+		{
+			purpose: "should panic when declared size is larger than available data",
+			input: []byte{
+				'I', 'D', '3', // ID3 identifier
+				0x03, 0x00, // version 3.0
+				0x80,                   // flags
+				0x00, 0x00, 0x01, 0x00, // size (128 + 10 = 138 bytes)
+			},
+			expected: nil,
+			panics:   true,
+		},
+		{
+			purpose: "should panic when ID3 identifier is missing",
+			input: []byte{
+				'I', 'D', '2', // wrong identifier
+				0x03, 0x00,
+				0x00,
+				0x00, 0x00, 0x00, 0x00,
+			},
+			expected: nil,
+			panics:   true,
+		},
+		{
+			purpose: "should panic with invalid identifier",
+			input: []byte{
+				'X', 'Y', 'Z', // wrong identifier
+				0x03, 0x00,
+				0x00,
+				0x00, 0x00, 0x00, 0x00,
+			},
+			expected: nil,
+			panics:   true,
+		},
+	}
+
+	for _, v := range table {
+		t.Run(v.purpose, func(t *testing.T) {
+			if v.panics {
+				result, err := ReadID3v2Header(v.input)
+				assert.Error(t, err, v.purpose)
+				assert.Nil(t, result, v.purpose)
+			} else {
+				result, err := ReadID3v2Header(v.input)
+				assert.NoError(t, err, v.purpose)
+				assert.Equal(t, v.expected, result, v.purpose)
+			}
+		})
+	}
+}

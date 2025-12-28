@@ -1,11 +1,13 @@
-CREATE DATABASE SPOTICLI_DB;
-
--- TODO: trying adding localhost again after disconnecting from vpb
-CREATE USER 'ADMIN'@'%' IDENTIFIED WITH mysql_native_password BY 'ADMIN';
-GRANT ALL PRIVILEGES ON `SPOTICLI_DB`.* TO 'ADMIN'@'%';
+-- User and database already created by environment variables
+-- Alter the user to use mysql_native_password
+ALTER USER 'ADMIN'@'%' IDENTIFIED WITH mysql_native_password BY 'ADMIN';
 FLUSH PRIVILEGES;
 
 USE SPOTICLI_DB;
+
+-- Drop and recreate tables to ensure clean state on every run
+DROP TABLE IF EXISTS FILE_META_INFO;
+DROP TABLE IF EXISTS FILE_TYPE;
 
 --  CREATE TABLE USER  (
 --  	id INT NOT NULL UNIQUE AUTO_INCREMENT,

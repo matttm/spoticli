@@ -10,12 +10,12 @@ import (
 )
 
 // ReadID3v2Header takes a []byte and returns a
-// []byte without an ID3 header
-func ReadID3v2Header(b []byte) []byte {
+// []byte without an ID3 header, or an error if the header is invalid
+func ReadID3v2Header(b []byte) ([]byte, error) {
 	idString := "ID3"
 	identifier := b[:3]
 	if !bytes.Equal(identifier, []byte(idString)) {
-		panic("No ID3v2 indicator found")
+		return nil, fmt.Errorf("no ID3v2 indicator found")
 	}
 	major := int(b[3])
 	revision := int(b[4])
@@ -30,7 +30,10 @@ func ReadID3v2Header(b []byte) []byte {
 
 	size := (s1 << (7 * 3)) + (s2 << (7 * 2)) + (s3 << 7) + s4 + 10
 	flog.Infof("ID3v2 tag size is %d bytes", size)
-	return b[size:]
+	if size > len(b) {
+		return nil, fmt.Errorf("declared ID3v2 size %d is larger than available data %d", size, len(b))
+	}
+	return b[size:], nil
 }
 
 // getCurrentFrameLength

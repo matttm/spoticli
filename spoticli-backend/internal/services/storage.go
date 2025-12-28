@@ -13,9 +13,9 @@ import (
 
 // A StorageService interacts directly with s3
 type StorageService struct {
-	client *s3.Client
+	client S3ClientApi
 	// for unauthenticated users:
-	psClient *s3.PresignClient
+	psClient S3PresignClientApi
 }
 
 var storageLock = &sync.Mutex{}
@@ -30,8 +30,15 @@ func GetStorageService() *StorageService {
 		defer storageLock.Unlock()
 		if storageService == nil {
 			storageService = &StorageService{}
-			storageService.client = s3.NewFromConfig(GetConfigService().CloudConfig)
-			storageService.psClient = s3.NewPresignClient(storageService.client)
+			cfg := GetConfigService().CloudConfig
+			// Use path-style addressing for LocalStack compatibility
+			client := s3.NewFromConfig(cfg, func(o *s3.Options) {
+				o.UsePathStyle = true
+			})
+			storageService.client = client
+			flog.Infof("S3 client configured with endpoint: %s", *cfg.BaseEndpoint)
+			storageService.psClient = s3.NewPresignClient(client)
+			flog.Infof("S3 presign client initialized with endpoint: %s", *client.Options().BaseEndpoint)
 			flog.Infof("StorageService Instantiated")
 		}
 	}
@@ -42,7 +49,8 @@ func (s *StorageService) PostPresignedUrl(key string) (*string, error) {
 	input := &s3.PutObjectInput{
 		Bucket: TRACKS_BUCKET_NAME,
 		//  ContentType: MIME_MP3,
-		Key: aws.String(key),
+		Key:         aws.String(key),
+		ContentType: aws.String("audio/mp3"),
 	}
 	req, err := s.psClient.PresignPutObject(
 		context.TODO(),
@@ -85,12 +93,21 @@ func (s *StorageService) DownloadFile(key string, _range *string) ([]byte, error
 		context.TODO(),
 		input,
 	)
+	if err != nil {
+		flog.Errorf(err.Error())
+		return nil, err
+	}
 	defer res.Body.Close()
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		flog.Errorf(err.Error())
+		return nil, err
 	}
-	body = ReadID3v2Header(body)
+	body, err = ReadID3v2Header(body)
+	if err != nil {
+		flog.Errorf(err.Error())
+		return nil, err
+	}
 	return body, nil
 }
 
@@ -105,12 +122,21 @@ func (s *StorageService) StreamFile(key string, start, end *int64) ([]byte, int6
 			context.TODO(),
 			input,
 		)
+		if err != nil {
+			flog.Errorf(err.Error())
+			return nil, 0, err
+		}
 		body, err := io.ReadAll(res.Body)
 		defer res.Body.Close()
 		if err != nil {
 			flog.Errorf(err.Error())
+			return nil, 0, err
 		}
-		body = ReadID3v2Header(body)
+		body, err = ReadID3v2Header(body)
+		if err != nil {
+			flog.Errorf(err.Error())
+			return nil, 0, err
+		}
 		framesBytes := len(body)
 		frames := PartitionMp3Frames(body)
 		flog.Infof("Frame count: %d", len(frames))
