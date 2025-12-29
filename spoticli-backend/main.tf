@@ -10,45 +10,14 @@ terraform {
 }
 
 # AWS Provider Configuration
-provider "aws" {
-  region                   = var.aws_region
-  shared_config_files      = ["~/.aws/config"]
-  shared_credentials_files = ["~/.aws/credentials"]
-  profile                  = "matttm"
-}
-
-# Variables
-variable "aws_region" {
-  description = "AWS region for resources"
-  type        = string
-  default     = "us-east-1"
-}
-
-variable "app_port" {
-  description = "Application port"
-  type        = number
-  default     = 4200
-}
-
-variable "fargate_cpu" {
-  description = "Fargate instance CPU units (256, 512, 1024, 2048, 4096)"
-  type        = number
-  default     = 256
-}
-
-variable "fargate_memory" {
-  description = "Fargate instance memory in MB (512, 1024, 2048, etc.)"
-  type        = number
-  default     = 512
-}
-
-variable "app_image" {
-  description = "Full image reference (e.g. 123456789012.dkr.ecr.us-east-1.amazonaws.com/spoticli-backend:latest or dockerhub-user/spoticli-backend:latest)"
-  type        = string
-}
-
-# Data source for current AWS account
-data "aws_caller_identity" "current" {}
+# Note: Provider is configured in overrides.tf for LocalStack
+# For real AWS, remove/rename overrides.tf and uncomment below:
+# provider "aws" {
+#   region                   = var.aws_region
+#   shared_config_files      = ["~/.aws/config"]
+#   shared_credentials_files = ["~/.aws/credentials"]
+#   profile                  = "matttm"
+# }
 
 # Use default VPC (already exists in your AWS account)
 data "aws_vpc" "default" {
@@ -65,7 +34,8 @@ data "aws_subnets" "default" {
 
 # S3 Bucket for Music Storage (simple configuration)
 resource "aws_s3_bucket" "music_storage" {
-  bucket = "spoticli-music-${data.aws_caller_identity.current.account_id}"
+  bucket        = var.tracks_bucket_name
+  force_destroy = true
 
   tags = {
     Name = "Spoticli Music Storage"
@@ -98,6 +68,34 @@ resource "aws_security_group" "fargate_tasks" {
   tags = {
     Name = "spoticli-fargate-sg"
   }
+}
+
+# Security Group for the database
+resource "aws_security_group" "db" {
+  name        = "spoticli-db-sg"
+  description = "Allow MySQL access from ECS tasks"
+  vpc_id      = data.aws_vpc.default.id
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "spoticli-db-sg"
+  }
+}
+
+resource "aws_security_group_rule" "db_from_tasks" {
+  type                     = "ingress"
+  description              = "MySQL from ECS tasks"
+  from_port                = var.db_port
+  to_port                  = var.db_port
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.db.id
+  source_security_group_id = aws_security_group.fargate_tasks.id
 }
 
 # IAM Role for ECS Task Execution (required by Fargate)
@@ -170,6 +168,38 @@ resource "aws_cloudwatch_log_group" "spoticli_backend" {
   }
 }
 
+# Database subnet group and instance
+resource "aws_db_subnet_group" "default" {
+  name       = "spoticli-db-subnets"
+  subnet_ids = data.aws_subnets.default.ids
+
+  tags = {
+    Name = "spoticli-db-subnets"
+  }
+}
+
+resource "aws_db_instance" "mysql" {
+  identifier              = "spoticli-db"
+  allocated_storage       = 20
+  engine                  = "mysql"
+  engine_version          = "8.0"
+  instance_class          = "db.t3.micro"
+  db_name                 = var.db_name
+  username                = var.db_username
+  password                = var.db_password
+  port                    = var.db_port
+  skip_final_snapshot     = true
+  apply_immediately       = true
+  backup_retention_period = 0
+  publicly_accessible     = true
+  db_subnet_group_name    = aws_db_subnet_group.default.name
+  vpc_security_group_ids  = [aws_security_group.db.id]
+
+  tags = {
+    Name = "spoticli-mysql"
+  }
+}
+
 # ECS Cluster
 resource "aws_ecs_cluster" "main" {
   name = "spoticli-cluster"
@@ -207,6 +237,38 @@ resource "aws_ecs_task_definition" "spoticli_backend" {
       {
         name  = "PORT"
         value = tostring(var.app_port)
+      },
+      {
+        name  = "DB_HOST"
+        value = aws_db_instance.mysql.address
+      },
+      {
+        name  = "DB_PORT"
+        value = tostring(var.db_port)
+      },
+      {
+        name  = "DB_USERNAME"
+        value = var.db_username
+      },
+      {
+        name  = "DB_PASSWORD"
+        value = var.db_password
+      },
+      {
+        name  = "STREAM_SEGMENT_SIZE"
+        value = tostring(var.stream_segment_size)
+      },
+      {
+        name  = "FRAME_CLUSTER_SIZE"
+        value = tostring(var.frame_cluster_size)
+      },
+      {
+        name  = "AWS_REGION"
+        value = var.aws_region
+      },
+      {
+        name  = "AWS_ENDPOINT_URL"
+        value = var.aws_endpoint_url
       }
     ]
 
@@ -249,4 +311,9 @@ output "music_bucket_name" {
 output "get_app_url" {
   description = "Run this command to get your app URL"
   value       = "./get-task-ip.sh"
+}
+
+output "db_endpoint" {
+  description = "RDS endpoint for the application database"
+  value       = aws_db_instance.mysql.address
 }
