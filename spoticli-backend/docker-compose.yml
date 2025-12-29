@@ -49,16 +49,17 @@ services:
       - "4510-4559:4510-4559" # required for newer versions
       - "8055:8055" # LocalStack web user interface
     environment:
-      # Specifies which services to run
-      SERVICES: s3
+      # Specifies which services to run - add more for Terraform practice
+      SERVICES: s3,rds,ecs,ec2,iam,cloudwatch,logs
       # Optional: Sets a fixed access key and secret key for local use
-      AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID:-}"
-      AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY:-}"
-      AWS_REGION: "${AWS_REGION:-us-east-1}"
+      AWS_ACCESS_KEY_ID: "test"
+      AWS_SECRET_ACCESS_KEY: "test"
+      AWS_REGION: "us-east-1"
       LOCALSTACK_ARCH: native
       # Enables a user interface to view resources
       USE_SSL: "false"
       EDGE_PORT: 4566
+      DEBUG: 1
     volumes:
       # Persists data across container restarts
       - localstack_data:/var/lib/localstack
