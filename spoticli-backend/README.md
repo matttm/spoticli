@@ -131,6 +131,8 @@ go build
 
 ## API Endpoints
 
+**📋 Complete API Schema:** The full API specification is available in [openapi.yml](openapi.yml) following the OpenAPI 3.0.3 standard. You can import this file into tools like [Swagger UI](https://editor.swagger.io/), Postman, or any OpenAPI-compatible client for interactive documentation and testing.
+
 ### Health Check
 - `GET /` - Returns service health status
 

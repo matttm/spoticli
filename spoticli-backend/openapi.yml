@@ -1,0 +1,315 @@
+openapi: 3.0.3
+info:
+  title: Spoticli Backend API
+  description: |
+    Backend API for Spoticli - a music streaming and management service.
+    Supports audio file upload, download, streaming, and file metadata management.
+  version: 1.0.0
+  contact:
+    name: matttm
+servers:
+  - url: http://localhost:4200
+    description: Local development server
+
+tags:
+  - name: Health
+    description: Service health monitoring
+  - name: Audio
+    description: Audio file operations including upload, download, and streaming
+  - name: Files
+    description: File metadata information
+
+paths:
+  /:
+    get:
+      tags:
+        - Health
+      summary: Health check endpoint
+      description: Returns service health status and version information
+      operationId: healthCheck
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthCheck'
+              example:
+                serviceName: spoticli-backend
+                version: v1.0.0
+                managedBy: matttm
+                timestamp: "2026-02-08T10:30:00Z"
+
+  /audio/{id}:
+    get:
+      tags:
+        - Audio
+      summary: Get presigned URL for audio file
+      description: Returns a presigned S3 URL for downloading an audio file directly from storage
+      operationId: getPresignedUrl
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Numeric ID of the audio file
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+          example: 123
+      responses:
+        '200':
+          description: Presigned URL returned successfully
+          content:
+            text/plain:
+              schema:
+                type: string
+                format: uri
+              example: "https://s3.amazonaws.com/bucket/file.mp3?X-Amz-Algorithm=..."
+        '400':
+          description: Invalid ID format
+        '404':
+          description: Audio file not found
+        '500':
+          description: Internal server error
+
+  /audio/proxy/{id}:
+    get:
+      tags:
+        - Audio
+      summary: Download entire audio file via proxy
+      description: Downloads the complete audio file through the backend proxy
+      operationId: getAudio
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Numeric ID of the audio file
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+          example: 123
+      responses:
+        '200':
+          description: Audio file downloaded successfully
+          headers:
+            Content-Type:
+              description: Audio MIME type
+              schema:
+                type: string
+                example: audio/mp3
+            Content-Length:
+              description: Size of the audio file in bytes
+              schema:
+                type: integer
+              example: 5242880
+            Content-Range:
+              description: Byte range of the content
+              schema:
+                type: string
+              example: "bytes 0-5242880/5242880"
+          content:
+            audio/mp3:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Invalid ID format
+        '404':
+          description: Audio file not found
+        '500':
+          description: Internal server error
+
+  /audio/proxy/stream/{id}:
+    get:
+      tags:
+        - Audio
+      summary: Stream audio segments with range support
+      description: |
+        Streams audio file segments supporting HTTP range requests for progressive streaming.
+        Clients can specify byte ranges using the Range header for partial content delivery.
+      operationId: getAudioPart
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Numeric ID of the audio file
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+          example: 123
+        - name: Range
+          in: header
+          required: false
+          description: Byte range to request (e.g., "bytes=0-1000000")
+          schema:
+            type: string
+            pattern: '^bytes=\d+-\d+$'
+          example: "bytes=0-1000000"
+      responses:
+        '206':
+          description: Partial content returned successfully
+          headers:
+            Content-Type:
+              description: Audio MIME type
+              schema:
+                type: string
+                example: audio/mp3
+            Content-Length:
+              description: Size of the returned segment in bytes
+              schema:
+                type: integer
+              example: 1000001
+            Content-Range:
+              description: Byte range of the returned content
+              schema:
+                type: string
+              example: "bytes 0-1000000/5242880"
+          content:
+            audio/mp3:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Invalid ID format or range
+        '404':
+          description: Audio file not found
+        '416':
+          description: Requested range not satisfiable
+        '500':
+          description: Internal server error
+
+  /audio:
+    post:
+      tags:
+        - Audio
+      summary: Upload music through presigned URL
+      description: |
+        Initiates music file upload by providing file metadata and receiving a presigned URL.
+        The client should then upload the file directly to the returned presigned URL.
+      operationId: uploadMusicThroughPresigned
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileMetaInfo'
+            example:
+              key_name: "a7x/city_of_evil/bat_country.mp3"
+              file_size: 5242880
+      responses:
+        '200':
+          description: Presigned upload URL generated successfully
+          content:
+            text/plain:
+              schema:
+                type: string
+                format: uri
+              example: "https://s3.amazonaws.com/bucket/file.mp3?X-Amz-Algorithm=..."
+        '400':
+          description: Invalid request body
+        '500':
+          description: Internal server error
+
+  /files/{cd}:
+    get:
+      tags:
+        - Files
+      summary: Get all files of a specific type
+      description: Retrieves metadata for all files matching the specified content descriptor (cd)
+      operationId: getAllFilesOfType
+      parameters:
+        - name: cd
+          in: path
+          required: true
+          description: Content descriptor/type identifier
+          schema:
+            type: integer
+            format: int32
+          example: 1
+      responses:
+        '200':
+          description: List of files returned successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FileMetaInfo'
+              example:
+                - key_name: "artist1/album1/song1.mp3"
+                  file_size: 5242880
+                - key_name: "artist1/album1/song2.mp3"
+                  file_size: 4194304
+        '400':
+          description: Invalid content descriptor
+        '500':
+          description: Internal server error
+
+components:
+  schemas:
+    HealthCheck:
+      type: object
+      required:
+        - serviceName
+        - version
+        - managedBy
+        - timestamp
+      properties:
+        serviceName:
+          type: string
+          description: Name of the service
+          example: spoticli-backend
+        version:
+          type: string
+          description: Version of the service
+          example: v1.0.0
+        managedBy:
+          type: string
+          description: Owner/maintainer of the service
+          example: matttm
+        timestamp:
+          type: string
+          description: Current timestamp of the health check
+          example: "2026-02-08T10:30:00Z"
+
+    FileMetaInfo:
+      type: object
+      required:
+        - key_name
+        - file_size
+      properties:
+        key_name:
+          type: string
+          description: |
+            S3 key/path for the file, typically in format: artist/album/song.mp3
+          example: "a7x/city_of_evil/bat_country.mp3"
+        file_size:
+          type: integer
+          format: int64
+          description: Size of the file in bytes
+          minimum: 1
+          example: 5242880
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+          example: "File not found"
+        code:
+          type: integer
+          description: Error code
+          example: 404
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT authentication (if implemented in future)
+
+security: []
