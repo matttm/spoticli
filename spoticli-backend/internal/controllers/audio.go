@@ -41,6 +41,13 @@ func GetAudio(w http.ResponseWriter, r *http.Request) {
 	body, length_64bit, err := audioService.GetAudio(id)
 	if err != nil {
 		flog.Errorf(err.Error())
+		http.Error(w, "failed to download file", http.StatusInternalServerError)
+		return
+	}
+	if length_64bit == nil {
+		flog.Errorf("nil length returned from GetAudio")
+		http.Error(w, "failed to download file", http.StatusInternalServerError)
+		return
 	}
 	length := strconv.FormatInt(*length_64bit, 10)
 	w.Header().Add("Content-Type", "audio/mp3")
@@ -81,6 +88,13 @@ func GetAudioPart(w http.ResponseWriter, r *http.Request) {
 	body, length, fileSize, err := audioService.StreamAudioSegment(id, &start, &end)
 	if err != nil {
 		flog.Errorf(err.Error())
+		http.Error(w, "failed to stream file", http.StatusInternalServerError)
+		return
+	}
+	if length == nil || fileSize == nil {
+		flog.Errorf("invalid stream length/fileSize returned")
+		http.Error(w, "failed to stream file", http.StatusInternalServerError)
+		return
 	}
 	flog.Infof("ContentLength %d", *length)
 	w.Header().Add("Content-Type", "audio/mp3")

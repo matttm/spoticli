@@ -180,6 +180,27 @@ go test ./...
 
 Mock generation is documented in [MOCKGEN.md](MOCKGEN.md).
 
+## Integration tests
+
+Integration tests exercise the full stack (app, database, LocalStack). The
+test itself is opt-in and will be skipped unless the `INTEGRATION` environment
+variable is set to `1`. Use the helper script which brings up the Docker
+services, generates a small test MP3, runs the integration test, and tears
+down the stack:
+
+```bash
+./scripts/run-integration.sh
+```
+
+If you want to keep the Docker stack running for inspection, set `INTEGRATION_DEBUG=1`:
+
+```bash
+INTEGRATION_DEBUG=1 ./scripts/run-integration.sh
+```
+
+CI systems should run `./scripts/run-integration.sh` (or the equivalent steps)
+to ensure the same environment as local runs.
+
 ## Architecture
 
 ### Database Schema

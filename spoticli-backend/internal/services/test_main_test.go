@@ -7,6 +7,11 @@ import (
 )
 
 func TestMain(m *testing.M) {
+	// Allow opting out of silencing for debugging integration tests.
+	if os.Getenv("INTEGRATION_DEBUG") == "1" {
+		os.Exit(m.Run())
+	}
+
 	// Silence stdout/stderr during tests to reduce noisy flog/println output.
 	oldOut := os.Stdout
 	oldErr := os.Stderr
