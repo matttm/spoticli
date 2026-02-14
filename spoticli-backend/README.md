@@ -184,8 +184,23 @@ Mock generation is documented in [MOCKGEN.md](MOCKGEN.md).
 
 Integration tests exercise the full stack (app, database, LocalStack). The
 test itself is opt-in and will be skipped unless the `INTEGRATION` environment
-variable is set to `1`. Use the helper script which brings up the Docker
-services, generates a small test MP3, runs the integration test, and tears
+variable is set to `1`. 
+
+### Test Assets
+
+A test tone MP3 file is available in the `assets/` folder and is used by the
+integration tests. If for any reason you need to regenerate it, you can run:
+
+```bash
+./scripts/generate_tone.sh ./assets
+```
+
+This requires `ffmpeg` to be installed on your system.
+
+### Running Integration Tests
+
+Use the helper script which brings up the Docker services, ensures the test
+tone exists (generating it if necessary), runs the integration test, and tears
 down the stack:
 
 ```bash
