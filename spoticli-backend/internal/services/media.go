@@ -7,7 +7,7 @@ type MediaService struct {
 
 var mediaService *MediaService
 
-func GetMusiceService() *MediaService {
+func GetMusicService() *MediaService {
 	if mediaService == nil {
 		mediaService = &MediaService{}
 		println("MusicService Instantiated")

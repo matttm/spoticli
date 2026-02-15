@@ -44,7 +44,8 @@ func StreamAudioSegment(id int, start, end *int64) ([]byte, *int, *int64, error)
 	flog.Infof("File selected for streaming %+v", t)
 	var filesize int64
 	// key := t.Key_name
-	if *start == 0 {
+	// Only apply default segment size when no end was requested (i.e., no Range header)
+	if *start == 0 && *end == 0 {
 		*end = GetConfigService().GetConfigValueInt64("STREAM_SEGMENT_SIZE")
 	}
 	if *start >= int64(t.File_size) {

@@ -143,3 +143,9 @@ func TestReadID3v2Header(t *testing.T) {
 		})
 	}
 }
+
+func TestReadID3v2Header_TruncatedAndEmpty_Panics(t *testing.T) {
+	// very small input will cause slices in the function to panic (index OOB)
+	assert.Panics(t, func() { _, _ = ReadID3v2Header([]byte{}) })
+	assert.Panics(t, func() { _, _ = ReadID3v2Header([]byte{'I', 'D'}) })
+}

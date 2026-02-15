@@ -103,11 +103,8 @@ func (s *StorageService) DownloadFile(key string, _range *string) ([]byte, error
 		flog.Errorf(err.Error())
 		return nil, err
 	}
-	body, err = ReadID3v2Header(body)
-	if err != nil {
-		flog.Errorf(err.Error())
-		return nil, err
-	}
+	// Return raw bytes as stored in S3; do not strip ID3 tags here so
+	// downloads match the uploaded content exactly.
 	return body, nil
 }
 
@@ -132,10 +129,29 @@ func (s *StorageService) StreamFile(key string, start, end *int64) ([]byte, int6
 			flog.Errorf(err.Error())
 			return nil, 0, err
 		}
-		body, err = ReadID3v2Header(body)
-		if err != nil {
-			flog.Errorf(err.Error())
-			return nil, 0, err
+		// If a specific byte range was requested, return the exact slice
+		// from the stored payload so the proxy honors Range requests.
+		filesize := int64(len(body))
+		if *end != 0 || *start != 0 {
+			s := *start
+			e := *end
+			if s < 0 {
+				s = 0
+			}
+			if e < 0 || e >= filesize {
+				e = filesize - 1
+			}
+			if s > e {
+				return []byte{}, filesize, nil
+			}
+			seg := body[s : e+1]
+			return seg, filesize, nil
+		}
+		// Try to strip ID3v2 header; if not present, treat payload as raw bytes
+		if stripped, err2 := ReadID3v2Header(body); err2 == nil {
+			body = stripped
+		} else {
+			flog.Infof("ReadID3v2Header: %v; treating payload as raw bytes", err2)
 		}
 		framesBytes := len(body)
 		frames := PartitionMp3Frames(body)

@@ -133,6 +133,8 @@ go build
 
 ## API Endpoints
 
+**📋 Complete API Schema:** The full API specification is available in [openapi.yml](openapi.yml) following the OpenAPI 3.0.3 standard. You can import this file into tools like [Swagger UI](https://editor.swagger.io/), Postman, or any OpenAPI-compatible client for interactive documentation and testing.
+
 ### Health Check
 - `GET /` - Returns service health status
 
@@ -179,6 +181,42 @@ go test ./...
 ```
 
 Mock generation is documented in [MOCKGEN.md](MOCKGEN.md).
+
+## Integration tests
+
+Integration tests exercise the full stack (app, database, LocalStack). The
+test itself is opt-in and will be skipped unless the `INTEGRATION` environment
+variable is set to `1`. 
+
+### Test Assets
+
+A test tone MP3 file is available in the `assets/` folder and is used by the
+integration tests. If for any reason you need to regenerate it, you can run:
+
+```bash
+./scripts/generate_tone.sh ./assets
+```
+
+This requires `ffmpeg` to be installed on your system.
+
+### Running Integration Tests
+
+Use the helper script which brings up the Docker services, ensures the test
+tone exists (generating it if necessary), runs the integration test, and tears
+down the stack:
+
+```bash
+./scripts/run-integration.sh
+```
+
+If you want to keep the Docker stack running for inspection, set `INTEGRATION_DEBUG=1`:
+
+```bash
+INTEGRATION_DEBUG=1 ./scripts/run-integration.sh
+```
+
+CI systems should run `./scripts/run-integration.sh` (or the equivalent steps)
+to ensure the same environment as local runs.
 
 ## Architecture
 
