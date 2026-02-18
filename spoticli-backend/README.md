@@ -6,7 +6,7 @@ For streaming, a naive approach is to segment an MP3 file randomly. This won't w
 
 The approach I ended up devising, was to partition each frame at the frame boundaries. Then when data is sent, a cluster of frames are merged into a byte array sent.
 
-This means that I first decode the ID3v2 tag, so I can remove it. Then I decode each frame's header to get the frame's size. I can then use this information to move to the start of thg next frame. I repeat this until no frames are left.
+This means that I first decode the ID3v2 tag, so I can remove it. Then I decode each frame's header to get the frame's size. I can then use this information to move to the start of the next frame. I repeat this until no frames are left.
 
 The anatomy of an mp3 is as shown below,
 ```
