@@ -34,7 +34,7 @@ In my algorithm, I strip the initial ID3v2 tag, then break the file apart by fra
     |                     |                     |                      |
 (1152 samples)      (1152 samples)      (1152 samples)      (1152 samples)  
 ```
-The frame slices are then grouped together, such that there is x frames per cluster. The size calculations required for this technique can be found in the [Decoder service](https://github.com/matttm/spoticli/blob/main/spoticli-backend/internal/services/decoder.go).
+The frame slices are then grouped together, such that there are x frames per grouping. The size calculations required for this technique can be found in the [Decoder service](https://github.com/matttm/spoticli/blob/main/spoticli-backend/internal/services/decoder.go).
 
 Also a feature of this backend is when doing a range request, only the start position is respected.
 
