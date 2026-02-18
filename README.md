@@ -24,7 +24,7 @@ The spoticli-backend provides a comprehensive audio streaming API with the follo
 
 ## Prerequisites
 
-- **Docker and Docker Compose** - For running the backend services
+- **Docker and Docker Compose** - For running the backend services locally
 - **Go 1.21+** - For building and running the CLI
 - **AWS Account** (optional) - Or use LocalStack for local S3 emulation
 
@@ -84,5 +84,6 @@ Use the arrow keys to navigate and press Enter to select a song for streaming.
 ## Contribute
 
 If you want to contribute, just send me a message.
+
 
 
