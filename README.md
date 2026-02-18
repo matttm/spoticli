@@ -1,7 +1,5 @@
 # spoticli
 
-Status: Active Development
-
 ## Description
 
 A CLI tool for streaming and downloading music from Amazon S3. This program streams or downloads MP3 files from AWS S3 to a command-line user. Downloading can be done directly (via presigned URLs) or through the backend serving the content. Streaming cannot be done using presigned URLs as backend processing is required to ensure proper MP3 frame alignment.
@@ -86,4 +84,5 @@ Use the arrow keys to navigate and press Enter to select a song for streaming.
 ## Contribute
 
 If you want to contribute, just send me a message.
+
 
